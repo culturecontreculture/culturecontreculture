@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '../../../../lib/supabase';
-import { createPayment } from '../../../../lib/easytransac';
+import { supabase } from '../../../lib/supabase';
+import { createPayment } from '../../../lib/easytransac';
 
 export async function POST(request) {
   try {
