@@ -1,0 +1,9 @@
+{
+  "buildCommand": "next build",
+  "framework": "nextjs",
+  "rewrites": [
+    { "source": "/", "destination": "/app/page" },
+    { "source": "/achats", "destination": "/app/achats/page" },
+    { "source": "/achats/(.*)", "destination": "/app/achats/[...slug]/page" }
+  ]
+}
