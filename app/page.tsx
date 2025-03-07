@@ -15,7 +15,7 @@ export default function HomePage() {
             <a href="https://poesie.culturecontreculture.fr/">
               <img src="/saez_poesie_anthologie.jpg" alt="Saez Poésie Anthologie" />
             </a>
-            <p>Damien Saez, Poésie - Anthologie 1999-2024</p>
+            <p>Damien Saez, Poésie - Anthologie 1999-2024.</p>
             <p><a href="https://poesie.culturecontreculture.fr/">poesie.culturecontreculture.fr</a></p>
           </div>
         </div>
