@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/mm/Documents/culturecontreculture/app/layout":["static/media/0cf099edf3f2badd-s.p.woff2","static/media/a251452556402cc8-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';

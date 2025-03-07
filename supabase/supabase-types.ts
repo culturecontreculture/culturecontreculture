@@ -153,10 +153,11 @@ export type ProductWithDetails = Product & {
   orderItems?: OrderItem[]
 }
 
+// Modified to match the actual Supabase query structure
 export type OrderWithDetails = Order & {
-  customer: Customer
-  items: (OrderItem & {
-    product: Product
+  customer?: Customer;
+  order_items: (OrderItem & {
+    products: Product
   })[]
 }
 

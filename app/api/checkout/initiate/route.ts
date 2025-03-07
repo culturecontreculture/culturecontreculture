@@ -59,7 +59,8 @@ export async function POST(request: NextRequest) {
       Email: customerInfo.email || '',
       FirstName: customerInfo.first_name || '',
       LastName: customerInfo.last_name || '',
-      3DS: 'yes', // Activer 3D Secure
+      // Correction: utilisation de la notation entre crochets au lieu d'un identifiant commençant par un chiffre
+      "3DS": 'yes', // Activer 3D Secure
       PaymentMethod: 'cb', // Carte bancaire par défaut
     };
     

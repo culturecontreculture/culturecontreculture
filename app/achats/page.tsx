@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { getSupabaseServerClient } from '@/lib/supabase/client';
 import ProductGrid from '@/components/ui/ProductGrid';
+import { FilterCheckbox, ProductsPerPage } from '@/components/client/FilterComponents';
 
 // Récupération des produits depuis Supabase
 async function getProducts(page = 1, limit = 12, active = true) {
@@ -61,39 +62,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         </div>
         
         <div className="flex items-center space-x-4">
-          <label className="flex items-center cursor-pointer font-mono text-text-secondary">
-            <input 
-              type="checkbox" 
-              className="mr-2 h-4 w-4 accent-primary"
-              defaultChecked={showInactive}
-              onChange={(e) => {
-                const url = new URL(window.location.href);
-                if (e.target.checked) {
-                  url.searchParams.set('showInactive', 'true');
-                } else {
-                  url.searchParams.delete('showInactive');
-                }
-                window.location.href = url.toString();
-              }}
-            />
-            Afficher inactifs
-          </label>
+          <FilterCheckbox 
+            label="Afficher inactifs" 
+            defaultChecked={showInactive} 
+          />
           
-          <select 
-            className="bg-background text-text-primary border border-primary p-2 font-mono"
-            defaultValue={limit.toString()}
-            onChange={(e) => {
-              const url = new URL(window.location.href);
-              url.searchParams.set('limit', e.target.value);
-              url.searchParams.delete('page'); // Réinitialiser la page
-              window.location.href = url.toString();
-            }}
-          >
-            <option value="6">6 par page</option>
-            <option value="12">12 par page</option>
-            <option value="24">24 par page</option>
-            <option value="48">48 par page</option>
-          </select>
+          <ProductsPerPage defaultValue={limit.toString()} />
         </div>
       </div>
       

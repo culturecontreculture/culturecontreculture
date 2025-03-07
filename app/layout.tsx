@@ -1,8 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Courier_Prime } from 'next/font/google';
-import { AuthProvider } from '@/context/AuthContext';
-import { CartProvider } from '@/context/CartContext';
 
 const courierPrime = Courier_Prime({
   weight: ['400', '700'],
@@ -23,14 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${courierPrime.variable} font-mono bg-background text-text-primary min-h-screen`}>
-        <AuthProvider>
-          <CartProvider>
-            {children}
-          </CartProvider>
-        </AuthProvider>
+      <body className={`${courierPrime.variable} font-mono min-h-screen`}>
+        {children}
       </body>
     </html>
   );
 }
-

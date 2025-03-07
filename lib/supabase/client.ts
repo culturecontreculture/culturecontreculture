@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/database';
+import { Database } from '@/supabase/supabase-types';
 
 // Création d'un client Supabase avec les variables d'environnement
 export const createSupabaseClient = () => {

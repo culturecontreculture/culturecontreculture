@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Product } from '@/types/database';
+import { Product } from '@/supabase/supabase-types';
 
 // Formater le prix de centimes en euros avec le symbole €
 const formatPrice = (priceInCents: number) => {

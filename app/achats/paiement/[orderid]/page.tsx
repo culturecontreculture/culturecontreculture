@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
-import { initEasyTransacPayment } from '@/lib/easytransac/client';
 
 interface PaymentPageProps {
   params: {
