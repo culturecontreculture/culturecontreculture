@@ -4,6 +4,9 @@
   "rewrites": [
     { "source": "/", "destination": "/app/page" },
     { "source": "/achats", "destination": "/app/achats/page" },
-    { "source": "/achats/(.*)", "destination": "/app/achats/[...slug]/page" }
+    { "source": "/achats/produit/:id", "destination": "/app/achats/produit/[id]/page" },
+    { "source": "/achats/auth/:path*", "destination": "/app/achats/auth/[...path]/page" },
+    { "source": "/achats/paiement/:orderId", "destination": "/app/achats/paiement/[orderId]/page" },
+    { "source": "/achats/:path", "destination": "/app/achats/:path/page" }
   ]
 }
