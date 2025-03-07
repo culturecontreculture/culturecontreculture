@@ -1,29 +1,25 @@
 import { Suspense } from 'react';
 import { getSupabaseServerClient } from '@/lib/supabase/client';
 import ProductGrid from '@/components/ui/ProductGrid';
-import { FilterCheckbox, ProductsPerPage } from '@/components/client/FilterComponents';
+import { FilterCheckbox } from '@/components/client/FilterComponents';
 
-// Récupération des produits depuis Supabase
-async function getProducts(page = 1, limit = 12, active = true) {
+// Récupération de tous les produits depuis Supabase sans pagination
+async function getAllProducts(showInactive = false) {
   const supabase = getSupabaseServerClient();
   
-  // Calculer l'offset basé sur la page et la limite
-  const offset = (page - 1) * limit;
-  
-  // Requête pour récupérer les produits actifs avec pagination
+  // Requête pour récupérer tous les produits
   let query = supabase
     .from('products')
-    .select('*', { count: 'exact' });
+    .select('*');
   
-  // Filtrer par statut actif si demandé
-  if (active) {
+  // Si showInactive est false, filtre pour n'afficher que les produits actifs
+  if (!showInactive) {
     query = query.eq('is_active', true);
   }
   
-  // Appliquer la pagination
-  const { data: products, error, count } = await query
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+  // Trier par date de création (les plus récents en premier)
+  const { data: products, error } = await query
+    .order('created_at', { ascending: false });
   
   if (error) {
     console.error('Erreur lors de la récupération des produits:', error);
@@ -32,25 +28,26 @@ async function getProducts(page = 1, limit = 12, active = true) {
   
   return { 
     products: products || [], 
-    count: count || 0 
+    count: products ? products.length : 0
   };
 }
 
 // Props de la page
 interface PageProps {
   searchParams: {
-    page?: string;
-    limit?: string;
     showInactive?: string;
   };
 }
 
 export default async function ProductsPage({ searchParams }: PageProps) {
-  const page = parseInt(searchParams.page || '1');
-  const limit = parseInt(searchParams.limit || '12');
   const showInactive = searchParams.showInactive === 'true';
   
-  const { products, count } = await getProducts(page, limit, !showInactive);
+  const { products, count } = await getAllProducts(true); // Récupérer tous les produits
+  
+  // Filtrer les produits en fonction de showInactive
+  const displayedProducts = showInactive 
+    ? products 
+    : products.filter(product => product.is_active);
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -58,7 +55,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       
       <div className="flex justify-between items-center mb-6">
         <div className="text-text-secondary font-mono">
-          {count} article{count !== 1 ? 's' : ''}
+          {displayedProducts.length} article{displayedProducts.length !== 1 ? 's' : ''}
         </div>
         
         <div className="flex items-center space-x-4">
@@ -66,35 +63,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
             label="Afficher inactifs" 
             defaultChecked={showInactive} 
           />
-          
-          <ProductsPerPage defaultValue={limit.toString()} />
         </div>
       </div>
       
       <Suspense fallback={<div className="text-primary font-mono">Chargement des produits...</div>}>
-        <ProductGrid products={products} />
+        <ProductGrid products={products} hideInactive={!showInactive} />
       </Suspense>
-      
-      {/* Pagination */}
-      {count > limit && (
-        <div className="flex justify-center mt-8">
-          <div className="flex space-x-2">
-            {Array.from({ length: Math.ceil(count / limit) }).map((_, index) => (
-              <a
-                key={index}
-                href={`/achats?page=${index + 1}&limit=${limit}${showInactive ? '&showInactive=true' : ''}`}
-                className={`px-4 py-2 border ${
-                  page === index + 1
-                    ? 'bg-primary text-background'
-                    : 'border-primary text-primary'
-                } font-mono`}
-              >
-                {index + 1}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

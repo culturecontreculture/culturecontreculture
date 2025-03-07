@@ -15,10 +15,19 @@ const formatPrice = (priceInCents: number) => {
 
 interface ProductCardProps {
   product: Product;
+  hideInactive: boolean;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, hideInactive }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Si le produit est inactif et qu'on ne veut pas afficher les inactifs, ne pas rendre le composant
+  if (!product.is_active && hideInactive) {
+    return null;
+  }
+  
+  // Détermine si le produit est cliquable
+  const isClickable = product.is_active;
   
   return (
     <div 
@@ -33,7 +42,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`object-cover transition-transform duration-300 ${isHovered ? 'scale-110' : 'scale-100'}`}
+            className={`object-cover transition-transform duration-300 ${isHovered && isClickable ? 'scale-110' : 'scale-100'}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-background">
@@ -53,7 +62,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <div className="flex justify-between items-center mt-2">
         <span className="text-primary font-bold">{formatPrice(product.price)}</span>
         
-        {product.is_active ? (
+        {isClickable ? (
           <Link href={`/achats/produit/${product.id}`} className="robot-button text-xs">
             Détails
           </Link>
@@ -69,10 +78,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 interface ProductGridProps {
   products: Product[];
+  hideInactive?: boolean;
 }
 
-const ProductGrid = ({ products }: ProductGridProps) => {
-  if (products.length === 0) {
+const ProductGrid = ({ products, hideInactive = false }: ProductGridProps) => {
+  // Filtrer les produits si hideInactive est true
+  const filteredProducts = hideInactive 
+    ? products.filter(product => product.is_active) 
+    : products;
+  
+  if (filteredProducts.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-text-secondary robot-text">Aucun produit disponible</p>
@@ -83,7 +98,11 @@ const ProductGrid = ({ products }: ProductGridProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard 
+          key={product.id} 
+          product={product} 
+          hideInactive={hideInactive}
+        />
       ))}
     </div>
   );
