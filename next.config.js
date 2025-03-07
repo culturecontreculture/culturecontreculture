@@ -13,4 +13,21 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+
+module.exports = {
+  // Vos configurations existantes...
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/app/page',
+        permanent: true,
+      },
+      {
+        source: '/achats',
+        destination: '/app/achats/page',
+        permanent: true,
+      },
+    ]
+  },
+}
