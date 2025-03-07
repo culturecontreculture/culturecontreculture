@@ -19,6 +19,10 @@ body {
     display: inline-block;
     animation: var(--cursor-blink);
   }
+  
+   .inactive {
+    @apply opacity-50 grayscale;
+  }
 
   .robot-button {
     @apply bg-transparent border border-primary text-primary px-4 py-2 transition-all duration-200;
@@ -154,14 +158,3 @@ body {
 
 /* Style pour les éléments inactifs à ajouter ou vérifier dans app/globals.css */
 
-@layer components {
-  /* Styles existants... */
-  
-  /* Style pour les éléments inactifs */
-  .inactive {
-    @apply opacity-50 grayscale;
-  }
-}
-
-/* Vous pouvez ajouter des styles spécifiques à la boutique ci-dessous, 
-   ou créer un autre fichier CSS pour la boutique */

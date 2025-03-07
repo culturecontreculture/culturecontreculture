@@ -1,8 +1,21 @@
 {
-  "/achats/page": "app/achats/page.js",
-  "/achats/produit/[id]/page": "app/achats/produit/[id]/page.js",
-  "/achats/checkout/page": "app/achats/checkout/page.js",
-  "/achats/auth/reset-password/page": "app/achats/auth/reset-password/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/signout/route": "app/api/auth/signout/route.js",
+  "/api/webhooks/easytransac/route": "app/api/webhooks/easytransac/route.js",
+  "/api/checkout/initiate/route": "app/api/checkout/initiate/route.js",
+  "/page": "app/page.js",
+  "/achats/auth/update-password/page": "app/achats/auth/update-password/page.js",
   "/achats/auth/register/page": "app/achats/auth/register/page.js",
-  "/achats/auth/login/page": "app/achats/auth/login/page.js"
+  "/achats/auth/reset-password/page": "app/achats/auth/reset-password/page.js",
+  "/achats/checkout/page": "app/achats/checkout/page.js",
+  "/achats/conditions-generales/page": "app/achats/conditions-generales/page.js",
+  "/achats/mentions-legales/page": "app/achats/mentions-legales/page.js",
+  "/achats/profil/page": "app/achats/profil/page.js",
+  "/achats/auth/register-succes/page": "app/achats/auth/register-succes/page.js",
+  "/achats/historique/page": "app/achats/historique/page.js",
+  "/achats/confirmation/page": "app/achats/confirmation/page.js",
+  "/achats/paiement/[orderid]/page": "app/achats/paiement/[orderid]/page.js",
+  "/achats/auth/login/page": "app/achats/auth/login/page.js",
+  "/achats/produit/[id]/page": "app/achats/produit/[id]/page.js",
+  "/achats/page": "app/achats/page.js"
 }

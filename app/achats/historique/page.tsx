@@ -2,6 +2,11 @@ import { Suspense } from 'react';
 import { getSupabaseServerClient } from '@/lib/supabase/client';
 import { OrderWithDetails, OrderStatus, PaymentStatus } from '@/supabase/supabase-types';
 import Link from 'next/link';
+import { revalidatePath } from 'next/cache';
+
+// Désactiver le cache pour cette route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Formater le prix de centimes en euros avec le symbole €
 const formatPrice = (priceInCents: number) => {
@@ -42,24 +47,32 @@ const getOrderStatusLabel = (status: string) => {
 async function fetchUserOrders(userId: string) {
   const supabase = getSupabaseServerClient();
   
-  const { data: orders, error } = await supabase
-    .from('orders')
-    .select(`
-      *,
-      order_items (
+  try {
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select(`
         *,
-        products (*)
-      )
-    `)
-    .eq('customer_id', userId)
-    .order('created_at', { ascending: false });
-  
-  if (error) {
-    console.error('Erreur lors de la récupération des commandes:', error);
+        order_items (
+          *,
+          products (*)
+        )
+      `)
+      .eq('customer_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Erreur lors de la récupération des commandes:', error);
+      return [];
+    }
+    
+    // Forcer la revalidation du chemin
+    revalidatePath('/achats/historique');
+    
+    return orders as OrderWithDetails[];
+  } catch (err) {
+    console.error('Exception lors de la récupération des commandes:', err);
     return [];
   }
-  
-  return orders as OrderWithDetails[];
 }
 
 // Composant de liste des commandes

@@ -2,6 +2,11 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getSupabaseServerClient } from '@/lib/supabase/client';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import { revalidatePath } from 'next/cache';
+
+// Désactiver le cache pour cette route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; 
 
 // Formater le prix de centimes en euros avec le symbole €
 const formatPrice = (priceInCents: number) => {
@@ -13,18 +18,27 @@ const formatPrice = (priceInCents: number) => {
 
 async function getProduct(id: string) {
   const supabase = getSupabaseServerClient();
-  const { data: product, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
   
-  if (error || !product) {
-    console.error('Erreur lors de la récupération du produit:', error);
+  try {
+    const { data: product, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error || !product) {
+      console.error('Erreur lors de la récupération du produit:', error);
+      return null;
+    }
+    
+    // Forcer la revalidation de ce chemin après chaque requête
+    revalidatePath(`/achats/produit/${id}`);
+    
+    return product;
+  } catch (err) {
+    console.error('Exception lors de la récupération du produit:', err);
     return null;
   }
-  
-  return product;
 }
 
 export default async function ProductDetailPage({
