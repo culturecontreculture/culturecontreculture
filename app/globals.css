@@ -151,5 +151,17 @@ body {
   margin: 0 auto;
 }
 
+
+/* Style pour les éléments inactifs à ajouter ou vérifier dans app/globals.css */
+
+@layer components {
+  /* Styles existants... */
+  
+  /* Style pour les éléments inactifs */
+  .inactive {
+    @apply opacity-50 grayscale;
+  }
+}
+
 /* Vous pouvez ajouter des styles spécifiques à la boutique ci-dessous, 
    ou créer un autre fichier CSS pour la boutique */
