@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import useAuth from '@/hooks/useAuth';
@@ -11,23 +11,43 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/achats';
 
+  // Si l'utilisateur est déjà connecté, rediriger
+  useEffect(() => {
+    if (user) {
+      console.log("Utilisateur déjà connecté, redirection vers:", redirectPath);
+      router.push(redirectPath);
+    }
+  }, [user, redirectPath, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setDebugInfo(null);
     setIsLoading(true);
 
     try {
-      await signIn(email, password);
-      // Rediriger vers le chemin de redirection ou la page par défaut
-      router.push(redirectPath);
+      setDebugInfo("Tentative de connexion...");
+      console.log("Tentative de connexion avec:", email);
+      
+      const authResult = await signIn(email, password);
+      
+      setDebugInfo("Connexion réussie, redirection vers: " + redirectPath);
+      console.log("Résultat connexion:", authResult);
+      
+      // Force la navigation avec window.location au lieu de router.push pour être sûr
+      window.location.href = redirectPath;
+      
     } catch (err) {
+      console.error("Erreur de connexion:", err);
       setError(err instanceof Error ? err.message : 'Erreur de connexion');
+      setDebugInfo("Erreur de connexion: " + (err instanceof Error ? err.message : 'Erreur inconnue'));
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +85,12 @@ const LoginForm = () => {
         />
       </div>
 
+      {debugInfo && (
+        <div className="bg-primary bg-opacity-10 border border-primary text-primary p-2 text-sm">
+          {debugInfo}
+        </div>
+      )}
+
       <button
         type="submit"
         className={`robot-button w-full py-3 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -94,6 +120,18 @@ const LoginFormSkeleton = () => (
 // Composant principal de la page
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams?.get('redirect') || '/achats';
+
+  // Si l'utilisateur est déjà connecté, rediriger
+  useEffect(() => {
+    if (!loading && user) {
+      console.log("Utilisateur déjà connecté au niveau de la page, redirection");
+      router.push(redirectPath);
+    }
+  }, [user, loading, redirectPath, router]);
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-md">

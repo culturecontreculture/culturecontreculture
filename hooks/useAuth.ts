@@ -7,16 +7,27 @@ const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
 
     // Récupérer la session actuelle
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user || null);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user || null);
+        console.log("Session récupérée:", session ? "Oui" : "Non");
+        if (session?.user) {
+          console.log("Utilisateur connecté:", session.user.email);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de la session:", error);
+      } finally {
+        setLoading(false);
+        setInitialized(true);
+      }
     };
 
     fetchSession();
@@ -24,6 +35,7 @@ const useAuth = () => {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Événement d'authentification:", event);
         setSession(session);
         setUser(session?.user || null);
       }
@@ -37,13 +49,23 @@ const useAuth = () => {
 
   // Fonction de connexion
   const signIn = async (email: string, password: string) => {
+    console.log("Tentative de connexion avec:", email);
     const supabase = getSupabaseClient();
+    
+    // Effacer toute session existante avant de tenter une nouvelle connexion
+    await supabase.auth.signOut();
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur de connexion:", error);
+      throw error;
+    }
+    
+    console.log("Connexion réussie:", data.session ? "Session établie" : "Pas de session");
     return data;
   };
 
@@ -113,6 +135,7 @@ const useAuth = () => {
     user,
     session,
     loading,
+    initialized,
     signIn,
     signUp,
     signOut,
