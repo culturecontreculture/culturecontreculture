@@ -1,57 +1,40 @@
-import { Suspense } from 'react';
-import { getSupabaseServerClient } from '@/lib/supabase/client';
-import ProductGrid from '@/components/ui/ProductGrid';
-import { revalidatePath } from 'next/cache';
+import Image from 'next/image';
+import Link from 'next/link';
 
-// Désactiver le cache pour cette route
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-// Récupération de tous les produits depuis Supabase sans pagination
-async function getAllProducts() {
-  const supabase = getSupabaseServerClient();
-  
-  try {
-    // Requête pour récupérer tous les produits, actifs et inactifs
-    const { data: products, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Erreur lors de la récupération des produits:', error);
-      return { products: [], count: 0 };
-    }
-    
-    // Forcer la revalidation du chemin après avoir obtenu les données
-    revalidatePath('/achats');
-    
-    return { 
-      products: products || [], 
-      count: products ? products.length : 0
-    };
-  } catch (err) {
-    console.error('Exception lors de la récupération des produits:', err);
-    return { products: [], count: 0 };
-  }
-}
-
-export default async function ProductsPage() {
-  const { products, count } = await getAllProducts();
-  
+export default function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-mono text-primary mb-6">Catalogue</h1>
-      
-      <div className="mb-6">
-        <div className="text-text-secondary font-mono">
-          {count} article{count !== 1 ? 's' : ''}
+    <div className="homepage">
+      {/* Deux colonnes */}
+      <div className="columns">
+        <div className="column">
+          <a href="https://tix.to/saezAR" target="_blank" rel="noopener noreferrer">
+            <Image 
+              src="/saez_apocalypse_tour.jpg"
+              alt="SAEZ Apocalypse Tour"
+              width={600}
+              height={400}
+              priority
+              style={{ width: '100%', height: 'auto' }}
+            />
+          </a>
+        </div>
+        <div className="column">
+          <div className="content">
+            <Link href="/achats" prefetch={false}>
+              <Image 
+                src="/saez_poesie_anthologie.jpg"
+                alt="Saez Poésie Anthologie"
+                width={600}
+                height={400}
+                priority
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </Link>
+            <p>Damien Saez, Poésie - Anthologie 1999-2024</p>
+            <p><a href="https://poesie.culturecontreculture.fr/" target="_blank" rel="noopener noreferrer">poesie.culturecontreculture.fr</a></p>
+          </div>
         </div>
       </div>
-      
-      <Suspense fallback={<div className="text-primary font-mono">Chargement des produits...</div>}>
-        <ProductGrid products={products} hideInactive={false} />
-      </Suspense>
     </div>
   );
 }
