@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cursor-blink: blink 1s step-end infinite;
+}
+
+body {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: 'Courier Prime', 'Courier New', monospace;
+}
+
+/* Style robotique pour les éléments interactifs */
+@layer components {
+  .robot-text::after {
+    content: "_";
+    display: inline-block;
+    animation: var(--cursor-blink);
+  }
+  
+   .inactive {
+    @apply opacity-50 grayscale;
+  }
+
+  .robot-button {
+    @apply bg-transparent border border-primary text-primary px-4 py-2 transition-all duration-200;
+  }
+  
+  .robot-button:hover {
+    @apply bg-primary text-background;
+  }
+  
+  .robot-button:active {
+    @apply bg-primary bg-opacity-70;
+  }
+  
+  .robot-input {
+    @apply bg-transparent border border-primary text-primary px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-primary;
+  }
+  
+  .robot-card {
+    @apply border border-primary p-4 transition-all duration-200 hover:shadow-[0_0_8px_rgba(0,255,0,0.5)];
+  }
+  
+  .robot-link {
+    @apply text-primary underline decoration-primary underline-offset-4 hover:text-opacity-80;
+  }
+  
+  /* Animation de typage pour le texte */
+  .typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid #00FF00;
+    width: 0;
+    animation: typing 2s steps(40, end) forwards, blink 0.75s step-end infinite;
+  }
+  
+  /* Style pour les éléments inactifs */
+  .inactive {
+    @apply opacity-50 grayscale;
+  }
+}
+
+
+/* Animations pour le style robotique */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  0%, 100% { border-color: transparent }
+  50% { border-color: #00FF00 }
+}
+
+/* Sélection de texte */
+::selection {
+  background-color: #00FF00;
+  color: #000000;
+}
+
+
+/* app/globals.css */
+
+/* Styles pour la page d'accueil */
+.homepage {
+  background-color: #333;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.homepage h1 {
+  color: #ddd;
+  font-size: 1.3rem;
+}
+
+.homepage p {
+  color: #ddd;
+}
+
+.homepage a {
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.homepage a:hover {
+  text-decoration: underline;
+}
+
+.homepage .video-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
+
+.homepage video, .homepage img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.homepage .columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.homepage .column {
+  flex: 1;
+  min-width: 300px;
+}
+
+.homepage .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+
+/* Style pour les éléments inactifs à ajouter ou vérifier dans app/globals.css */
+
