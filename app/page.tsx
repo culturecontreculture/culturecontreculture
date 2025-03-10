@@ -20,7 +20,7 @@ export default function HomePage() {
         </div>
         <div className="column">
           <div className="content">
-            <Link href="/achats" prefetch={false}>
+            <Link href="https://poesie.culturecontreculture.fr/" prefetch={false}>
               <Image 
                 src="/saez_poesie_anthologie.jpg"
                 alt="Saez Poésie Anthologie"
