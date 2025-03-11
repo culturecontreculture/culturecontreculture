@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culture contre culture</title>
+  <style>
+    body {
+      background-color: #333;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .watermark {
+      text-align: center;
+      color: grey;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+    .left, .right {
+      flex: 1;
+      min-width: 300px;
+    }
+    .main-title {
+      font-size: 1.3em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* Partie gauche (Livre) */
+    .books-section .subtitle {
+      text-align: center;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+    }
+    .books-section .full-image {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    /* Partie droite (Apocalypse Tour) */
+    .apocalypse-section {
+      text-align: center;
+      overflow: hidden;
+    }
+    .apocalypse-section img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      object-fit: cover;
+    }
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark">CULTURE CONTRE CULTURE</div>
+  <div class="container">
+    <!-- Bloc de gauche : Livre -->
+    <div class="left books-section">
+      <h1 class="main-title">Le livre remplace le disque</h1>
+      <a href="https://boutique.culturecontreculture.fr">
+        <img src="livres_ccc.jpg" alt="Livres" class="full-image">
+      </a>
+    </div>
+    <!-- Bloc de droite : Apocalypse Tour -->
+    <div class="right apocalypse-section">
+      <h1 class="main-title">Apocalypse Tour</h1>
+      <a href="https://tix.to/saezAR">
+        <img src="https://www.saez.mu/saez_apocalypse_tour.jpg" alt="SAEZ Apocalypse Tour">
+      </a>
+    </div>
+  </div>
+  <script>
+    // Ajuste la hauteur maximale du bloc de droite pour qu'elle ne dépasse jamais celle du bloc de gauche
+    function adjustRightHeight() {
+      var left = document.querySelector('.left.books-section');
+      var right = document.querySelector('.right.apocalypse-section');
+      if (left && right) {
+        right.style.maxHeight = left.offsetHeight + 'px';
+      }
+    }
+    window.addEventListener('load', adjustRightHeight);
+    window.addEventListener('resize', adjustRightHeight);
+  </script>
+</body>
+</html>
