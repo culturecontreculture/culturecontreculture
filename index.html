@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culture contre culture</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #1a1a1a;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .watermark {
+      text-align: center;
+      color: #666;
+      font-size: 1.2em;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+    }
+
+    .main-container {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .bataclan-section {
+      text-align: center;
+    }
+
+    .bataclan-section a {
+      display: inline-block;
+      width: 100%;
+    }
+
+    .bataclan-section img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .bataclan-section a:hover img {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .watermark {
+        font-size: 1em;
+        margin-bottom: 20px;
+      }
+
+      .main-container {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      .watermark {
+        font-size: 0.9em;
+        letter-spacing: 2px;
+      }
+    }
+  </style>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div class="watermark">Culture contre culture</div>
+  
+  <div class="main-container">
+    <section class="bataclan-section">
+      <a href="https://tix.to/damien-saezAR/snbib" target="_blank" rel="noopener">
+        <img src="saez_bataclan_1712.png" alt="Damien Saez - Bataclan 17 décembre 2025">
+      </a>
+    </section>
+  </div>
+</body>
+</html>
