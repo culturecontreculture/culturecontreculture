@@ -19,56 +19,102 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
 
     .watermark {
       text-align: center;
       color: #666;
-      font-size: 1.2em;
+      font-size: 1em;
       letter-spacing: 3px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-transform: uppercase;
     }
 
     .main-container {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
       width: 100%;
     }
 
-    .bataclan-section {
+    /* Section texte poétique - En haut centre */
+    .poetry-section {
       text-align: center;
+      margin-bottom: 50px;
+      padding: 80px 20px;
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    .bataclan-section a {
-      display: inline-block;
-      width: 100%;
+    .poetry-section p {
+      font-size: 1.8em;
+      line-height: 1.3;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 40px;
     }
 
-    .bataclan-section img {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .poetry-section a {
+      font-size: 1.1em;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+      line-height: 1.8;
     }
 
-    .bataclan-section a:hover img {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+    .poetry-section a:hover {
+      color: #ccc;
+    }
+
+    .poetry-section .footer-text {
+      font-size: 1.1em;
+      color: #999;
+      letter-spacing: 0.5px;
+      line-height: 1.8;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     /* Responsive */
+    @media (max-width: 1024px) {
+      .poetry-section p {
+        font-size: 2em;
+      }
+
+      .poetry-section a {
+        font-size: 1em;
+      }
+
+      .poetry-section .footer-text {
+        font-size: 1em;
+      }
+    }
+
     @media (max-width: 768px) {
       .watermark {
         font-size: 1em;
         margin-bottom: 20px;
       }
 
-      .main-container {
-        max-width: 100%;
+      .poetry-section {
+        padding: 60px 15px;
+        min-height: 60vh;
+      }
+
+      .poetry-section p {
+        font-size: 1.6em;
+        line-height: 1.7;
+      }
+
+      .poetry-section a {
+        font-size: 0.95em;
+      }
+
+      .poetry-section .footer-text {
+        font-size: 0.95em;
+        padding: 0 10px;
       }
     }
 
@@ -81,6 +127,30 @@
         font-size: 0.9em;
         letter-spacing: 2px;
       }
+
+      .poetry-section {
+        padding: 40px 10px;
+        min-height: 50vh;
+      }
+
+      .poetry-section p {
+        font-size: 1.3em;
+        line-height: 1.6;
+        letter-spacing: 1.5px;
+      }
+
+      .poetry-section a {
+        font-size: 0.9em;
+      }
+
+      .poetry-section .footer-text {
+        font-size: 0.9em;
+        padding: 0 5px;
+      }
+
+      .poetry-section a {
+        font-size: 0.8em;
+      }
     }
   </style>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -89,10 +159,21 @@
   <div class="watermark">Culture contre culture</div>
   
   <div class="main-container">
-    <section class="bataclan-section">
-      <a href="https://tix.to/damien-saezAR/snbib" target="_blank" rel="noopener">
-        <img src="saez_bataclan_1712.png" alt="Damien Saez - Bataclan 17 décembre 2025">
-      </a>
+    <!-- Section texte poétique -->
+    <section class="poetry-section">
+      <p>
+        À toute question ma réponse est :<br><br>
+        Ma poésie<br>
+        Mes textes<br>
+        Nos concerts
+      </p>
+      <div class="footer-text"><br><br>
+      Zénith 29/12/22 et/ou Nîmes 01/07/23 <br>
+        Pour ceux qui estiment ne pas en avoir eu assez pour leur argent,<br>
+        <a href="https://saez2021.culturecontreculture.fr" target="_blank" rel="noopener">Lien pour remboursement des disques</a><br>
+        <br>
+        Pour les autres, je vous écris bientôt ma famille.<br><br>
+        Fraternellement,<br>le petit marin fou</div>
     </section>
   </div>
 </body>
