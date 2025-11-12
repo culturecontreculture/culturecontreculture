@@ -12,169 +12,40 @@
     }
 
     body {
-      background-color: #1a1a1a;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      padding: 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background-color: #000;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
     }
 
-    .watermark {
-      text-align: center;
-      color: #666;
-      font-size: 1em;
-      letter-spacing: 3px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
-
-    .main-container {
-      max-width: 1100px;
-      margin: 0 auto;
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
+      height: 100%;
     }
 
-    /* Section texte poétique - En haut centre */
-    .poetry-section {
-      text-align: center;
-      margin-bottom: 50px;
-      padding: 80px 20px;
-      min-height: 70vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .poetry-section p {
-      font-size: 1.8em;
-      line-height: 1.3;
-      letter-spacing: 2px;
-      color: #fff;
-      margin-bottom: 40px;
-    }
-
-    .poetry-section a {
-      font-size: 1.1em;
-      color: #fff;
-      text-decoration: none;
-      letter-spacing: 0.5px;
-      transition: color 0.3s ease;
-      line-height: 1.8;
-    }
-
-    .poetry-section a:hover {
-      color: #ccc;
-    }
-
-    .poetry-section .footer-text {
-      font-size: 1.1em;
-      color: #999;
-      letter-spacing: 0.5px;
-      line-height: 1.8;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .poetry-section p {
-        font-size: 2em;
-      }
-
-      .poetry-section a {
-        font-size: 1em;
-      }
-
-      .poetry-section .footer-text {
-        font-size: 1em;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .watermark {
-        font-size: 1em;
-        margin-bottom: 20px;
-      }
-
-      .poetry-section {
-        padding: 60px 15px;
-        min-height: 60vh;
-      }
-
-      .poetry-section p {
-        font-size: 1.6em;
-        line-height: 1.7;
-      }
-
-      .poetry-section a {
-        font-size: 0.95em;
-      }
-
-      .poetry-section .footer-text {
-        font-size: 0.95em;
-        padding: 0 10px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 15px;
-      }
-
-      .watermark {
-        font-size: 0.9em;
-        letter-spacing: 2px;
-      }
-
-      .poetry-section {
-        padding: 40px 10px;
-        min-height: 50vh;
-      }
-
-      .poetry-section p {
-        font-size: 1.3em;
-        line-height: 1.6;
-        letter-spacing: 1.5px;
-      }
-
-      .poetry-section a {
-        font-size: 0.9em;
-      }
-
-      .poetry-section .footer-text {
-        font-size: 0.9em;
-        padding: 0 5px;
-      }
-
-      .poetry-section a {
-        font-size: 0.8em;
-      }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
   </style>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <div class="watermark">Culture contre culture</div>
-  
-  <div class="main-container">
-    <!-- Section texte poétique -->
-    <section class="poetry-section">
-      <p>
-        À toute question ma réponse est :<br><br>
-        Ma poésie<br>
-        Mes textes<br>
-        Nos concerts
-      </p>
-      <div class="footer-text"><br><br>
-      Zénith 29/12/22 et/ou Nîmes 01/07/23 <br>
-        Pour ceux qui estiment ne pas en avoir eu assez pour leur argent,<br>
-        <a href="https://saez2021.culturecontreculture.fr" target="_blank" rel="noopener">Lien pour remboursement des disques</a><br>
-        <br>
-        Pour les autres, je vous écris bientôt ma famille.<br><br>
-        Fraternellement,<br>le petit marin fou</div>
-    </section>
+  <div class="video-container">
+    <iframe 
+      src="https://player.vimeo.com/video/190226563?h=c63b985709&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=0" 
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+      referrerpolicy="strict-origin-when-cross-origin" 
+      title="Les enfants paradis">
+    </iframe>
   </div>
+  <script src="https://player.vimeo.com/api/player.js"></script>
 </body>
 </html>
