@@ -1,51 +1,75 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Culture contre culture</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAEZ - Les Maudits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      background-color: #000;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
 
-    .video-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-  </style>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+        /* Halo fixe indépendant des images */
+        .glow-layer {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glow-layer::after {
+            content: '';
+            position: absolute;
+            width: min(90vh, 90vw);
+            height: min(90vh, 90vw);
+            box-shadow: 0 0 60px 20px rgba(139, 0, 0, 0.25);
+        }
+
+        .slide {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
-  <div class="video-container">
-    <iframe 
-      src="https://player.vimeo.com/video/190226563?h=c63b985709&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=0" 
-      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-      referrerpolicy="strict-origin-when-cross-origin" 
-      title="Les enfants paradis">
-    </iframe>
-  </div>
-  <script src="https://player.vimeo.com/api/player.js"></script>
+    <div class="container">
+        <div class="glow-layer"></div>
+        <div class="slide">
+            <img src="001.jpg" alt="Les Maudits">
+        </div>
+    </div>
 </body>
 </html>
