@@ -24,7 +24,7 @@
             align-items: center;
             justify-content: center;
             padding: 30px 20px;
-            gap: 16px;
+            gap: 24px;
         }
 
         .main-image {
@@ -41,7 +41,7 @@
             display: block;
             cursor: pointer;
             flex-shrink: 0;
-            opacity: 0.75;
+            opacity: 0.70;
             transition: opacity 0.3s ease, filter 0.3s ease;
         }
 
@@ -55,6 +55,12 @@
         .reserve-btn:hover {
             opacity: 1;
             filter: drop-shadow(0 0 8px rgba(160, 0, 0, 0.3));
+        }
+
+        @media (max-width: 480px) {
+            .reserve-btn img {
+                width: min(160px, 44vw);
+            }
         }
     </style>
 </head>
