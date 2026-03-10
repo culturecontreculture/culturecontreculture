@@ -121,36 +121,37 @@
             }
         }
 
-        /* Mobile : empilement */
+        /* Mobile : reset total → tout en block, plus de flex */
         @media (max-width: 560px) {
             .main-container {
-                padding: 24px 16px;
+                display: block;
                 height: auto;
                 min-height: 100vh;
+                padding: 24px 16px;
             }
 
             .content-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 18px;
+                display: block;
                 width: 100%;
             }
 
             .main-image {
-                width: min(88vw, 400px);
+                display: block;
+                width: 88vw;
+                max-width: 400px;
                 max-height: none;
+                margin: 0 auto;
             }
 
             .right-col {
-                flex: 0 0 auto;
-                width: min(88vw, 400px);
-                align-items: center;
+                display: block;
+                width: 100%;
+                margin-top: 18px;
             }
 
             .video-group {
+                display: block;
                 width: 100%;
-                justify-content: flex-start;
-                gap: 14px;
             }
 
             .video-wrap {
@@ -158,10 +159,13 @@
             }
 
             .reserve-btn {
-                padding-top: 0;
+                display: block;
+                padding-top: 14px;
             }
 
             .reserve-btn img {
+                display: block;
+                margin: 0 auto;
                 width: min(180px, 50vw);
             }
         }
