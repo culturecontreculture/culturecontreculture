@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture contre culture - SAEZ - Damien Saez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+
+        .main-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            gap: 20px;
+            max-width: min(92vw, 900px);
+            max-height: calc(100vh - 60px);
+            width: 100%;
+        }
+
+        .main-image {
+            display: block;
+            flex: 1 1 0;
+            min-width: 0;
+            max-height: calc(100vh - 60px);
+            width: auto;
+            height: auto;
+            border-radius: 6px;
+            filter: drop-shadow(0 0 30px rgba(160, 0, 0, 0.2));
+        }
+
+        .reserve-btn {
+            display: block;
+            cursor: pointer;
+            flex-shrink: 0;
+            opacity: 0.75;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .reserve-btn img {
+            display: block;
+            width: 150px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .reserve-btn:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 8px rgba(160, 0, 0, 0.3));
+        }
+
+        @media (max-width: 500px) {
+            .content-wrapper {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 14px;
+                max-height: none;
+            }
+
+            .main-image {
+                max-height: calc(100vh - 140px);
+                width: 100%;
+            }
+
+            .reserve-btn img {
+                width: min(180px, 50vw);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content-wrapper">
+            <img class="main-image" src="300127.webp" alt="Les Maudits">
+            <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="reserve-btn">
+                <img src="reserver.webp" alt="Réserver">
+            </a>
+        </div>
+    </div>
+</body>
+</html>
