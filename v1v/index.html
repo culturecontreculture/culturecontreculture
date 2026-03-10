@@ -29,7 +29,7 @@
         /* Ligne principale : image | colonne droite */
         .content-row {
             display: flex;
-            align-items: flex-start;
+            align-items: stretch;
             gap: 48px;
             width: min(88vw, 1300px);
         }
@@ -38,6 +38,7 @@
         .main-image {
             display: block;
             flex: 0 0 auto;
+            align-self: flex-start;
             width: 38%;
             height: auto;
             max-height: calc(100vh - 80px);
@@ -51,7 +52,17 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            align-items: center; /* centre video-group horizontalement */
+        }
+
+        /* ---- GROUPE vidéo + bouton : 84% de la colonne, centré ---- */
+        .video-group {
+            flex: 1;
+            width: 84%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* ---- VIDÉO ---- */
@@ -81,9 +92,8 @@
             display: block;
             cursor: pointer;
             opacity: 0.70;
+            padding-top: 14px; /* espace minimum avec la vidéo */
             transition: opacity 0.3s ease, filter 0.3s ease;
-            /* centré sous la vidéo */
-            align-self: center;
         }
 
         .reserve-btn img {
@@ -100,7 +110,7 @@
 
         /* ---- RESPONSIVE ---- */
 
-        /* Tablette : réduire un peu */
+        /* Tablette */
         @media (max-width: 768px) {
             .content-row {
                 gap: 28px;
@@ -132,7 +142,24 @@
             }
 
             .right-col {
+                flex: 0 0 auto;
                 width: min(88vw, 400px);
+                align-items: center;
+            }
+
+            .video-group {
+                display: block; /* sort du flex, centrage simple */
+                width: 100%;
+            }
+
+            .video-wrap {
+                width: 100%;
+            }
+
+            .reserve-btn {
+                display: block;
+                width: fit-content;
+                margin: 14px auto 0; /* centrage fiable */
             }
 
             .reserve-btn img {
@@ -148,19 +175,21 @@
             <img class="main-image" src="300127.webp" alt="Les Maudits">
 
             <div class="right-col">
-                <!-- Remplacer VIDEO_ID par l'identifiant YouTube -->
-                <div class="video-wrap">
-                    <iframe
-                        src="https://www.youtube.com/embed/VIDEO_ID?rel=0&modestbranding=1&autoplay=0"
-                        title="SAEZ – Le Concert du Siècle"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>
+                <div class="video-group">
+                    <!-- Remplacer VIDEO_ID par l'identifiant YouTube -->
+                    <div class="video-wrap">
+                        <iframe
+                            src="https://www.youtube.com/embed/VIDEO_ID?rel=0&modestbranding=1&autoplay=0"
+                            title="SAEZ – Le Concert du Siècle"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
 
-                <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="reserve-btn">
-                    <img src="reserver.webp" alt="Réserver">
-                </a>
+                    <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="reserve-btn">
+                        <img src="reserver.webp" alt="Réserver">
+                    </a>
+                </div>
             </div>
 
         </div>
