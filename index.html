@@ -11,191 +11,439 @@
             box-sizing: border-box;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
+        body {
             background-color: #000;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        .main-container {
-            height: 100vh;
+            min-height: 100svh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 24px;
         }
 
-        /* Ligne principale : image | colonne droite */
-        .content-row {
-            display: flex;
-            align-items: stretch;
-            gap: 48px;
-            width: min(88vw, 1300px);
+        /*
+         *  Grid 3 lignes × 2 colonnes — centré dans le viewport
+         *  row 1 : slideshow 40vh  |  poster 40vh   (même hauteur)
+         *  row 2 : dates auto      |  info Paris    (hauteur naturelle)
+         *  row 3 : bouton          |  bouton
+         */
+
+        .page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 40vh auto auto;
+            width: 100%;
         }
 
-        /* ---- IMAGE ---- */
-        .main-image {
-            display: block;
-            flex: 0 0 auto;
-            align-self: flex-start;
-            width: 38%;
-            height: auto;
-            max-height: calc(100vh - 80px);
-            border-radius: 6px;
-            filter: drop-shadow(0 0 28px rgba(150, 0, 0, 0.2));
-        }
+        /* Séparateur vertical */
+        .col-left  { border-right: 1px solid rgba(106, 47, 47, 0.22); }
+        .col-right { border-left:  1px solid rgba(106, 47, 47, 0.22); margin-left: -1px; }
 
-        /* ---- COLONNE DROITE ---- */
-        .right-col {
-            flex: 1 1 0;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* ============================
+           ROW 1 gauche — SLIDESHOW
+        ============================= */
 
-        /* ---- GROUPE vidéo + bouton : 84% de la colonne, centré ---- */
-        .video-group {
-            flex: 1;
-            width: 84%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* ---- VIDÉO ---- */
-        .video-wrap {
+        .zone-slideshow {
+            grid-column: 1;
+            grid-row: 1;
             position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 */
-            height: 0;
             overflow: hidden;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 28px rgba(140, 0, 0, 0.15);
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
         }
 
-        .video-wrap iframe {
+        .slide {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 40px;
         }
 
-        /* ---- BOUTON ---- */
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .slide:nth-child(1) img {
+            filter: drop-shadow(0 0 50px rgba(139, 0, 0, 0.25));
+        }
+
+        .slide:nth-child(2) {
+            opacity: 0;
+            animation: fadeInOut 10s infinite 3s;
+        }
+
+        @keyframes fadeInOut {
+            0%   { opacity: 0; }
+            10%  { opacity: 1; }
+            40%  { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ============================
+           ROW 1+2 droite — POSTER (span)
+        ============================= */
+
+        .zone-poster {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 48px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        /* ============================
+           ROW 2 droite — INFO PARIS
+        ============================= */
+
+        .zone-paris-info {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 48px;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .paris-poster {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
+            filter: drop-shadow(0 0 40px rgba(140, 0, 0, 0.25));
+        }
+
+        /* ============================
+           ROW 2 gauche — DATES
+        ============================= */
+
+        .zone-dates {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 24px 40px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .col-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .dates-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+        }
+
+        .date-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .date-d {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            color: #555;
+            font-weight: 300;
+        }
+
+        .date-city {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6a2f2f;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .date-venue {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ============================
+           ROW 3 — BOUTONS
+        ============================= */
+
+        .zone-btn-tour {
+            grid-column: 1;
+            grid-row: 3;
+        }
+
+        .zone-btn-paris {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .zone-btn-tour,
+        .zone-btn-paris {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 22px 40px;
+        }
+
+        .paris-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #3d1f1f 0%, #2d1515 100%);
+            border: 1px solid rgba(106, 47, 47, 0.3);
+            color: #967a7a;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before { left: 100%; }
+
+        .cta-button:hover {
+            background: linear-gradient(135deg, #4d2525 0%, #3d1b1b 100%);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            transform: translateY(-2px);
+            color: #a68a8a;
+        }
+
         .reserve-btn {
             display: block;
             cursor: pointer;
             opacity: 0.70;
-            padding-top: 14px;
             transition: opacity 0.3s ease, filter 0.3s ease;
         }
 
         .reserve-btn img {
             display: block;
-            width: min(160px, 42vw);
+            width: 140px;
             height: auto;
             border-radius: 4px;
         }
 
         .reserve-btn:hover {
             opacity: 1;
-            filter: drop-shadow(0 0 8px rgba(160, 0, 0, 0.3));
+            filter: drop-shadow(0 0 10px rgba(160, 0, 0, 0.4));
         }
 
-        /* ---- RESPONSIVE ---- */
+        /* ============================
+           RESPONSIVE
+        ============================= */
 
-        /* Tablette */
-        @media (max-width: 768px) {
-            .content-row {
-                gap: 28px;
-            }
-
-            .main-image {
-                width: min(42vw, 320px);
+        @media (max-width: 860px) {
+            .slide,
+            .zone-poster,
+            .zone-dates,
+            .zone-btn-tour,
+            .zone-btn-paris {
+                padding-left: 24px;
+                padding-right: 24px;
             }
         }
 
-        /* Mobile */
-        @media (max-width: 560px) {
-            .main-container {
-                display: block;
-                height: auto;
-                min-height: 100vh;
-                padding: 24px 16px;
+        @media (max-width: 640px) {
+            body { align-items: stretch; }
+
+            .page {
+                display: flex;
+                flex-direction: column;
             }
 
-            .content-row {
-                display: block;
-                width: 100%;
+            .zone-poster     { order: 1; height: 80vw; border-bottom: none; padding: 16px; }
+            .zone-paris-info { order: 2; }
+            .zone-btn-paris  { order: 3; border-bottom: 1px solid rgba(106,47,47,0.2); }
+            .zone-slideshow  { order: 4; height: 80vw; border-bottom: none; }
+            .zone-dates      { order: 5; }
+            .zone-btn-tour   { order: 6; }
+
+            .zone-poster .paris-poster {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
             }
 
-            .main-image {
-                display: block;
-                width: 88vw;
-                max-width: 400px;
-                max-height: none;
-                margin: 0 auto;
+            .slide { padding: 16px; }
+            .slide img {
+                object-fit: contain;
             }
 
-            .right-col {
-                display: block;
-                width: 100%;
-                margin-top: 18px;
-            }
+            .col-left  { border-right: none; }
+            .col-right { border-left: none; margin-left: 0; }
 
-            .video-group {
-                display: block;
-                width: 100%;
-            }
-
-            .video-wrap {
-                width: 100%;
-            }
-
-            .reserve-btn {
-                display: block;
-                padding-top: 14px;
-            }
-
-            .reserve-btn img {
-                display: block;
-                margin: 0 auto;
-                width: min(180px, 50vw);
-            }
+            .cta-button { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="content-row">
+    <div class="page">
 
-            <img class="main-image" src="300127.webp" alt="Les Maudits">
+        <!-- ROW 1 gauche : slideshow -->
+        <div class="zone-slideshow col-left">
+            <div class="slide">
+                <img src="../001.jpg" alt="Les Maudits">
+            </div>
+            <div class="slide">
+                <img src="../002.jpg" alt="Les Mots Dits">
+            </div>
+        </div>
 
-            <div class="right-col">
-                <div class="video-group">
-                    <div class="video-wrap">
-                        <iframe
-                            src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1"
-                            title="YouTube video player"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
+        <!-- ROW 1+2 droite : poster Paris -->
+        <div class="zone-poster col-right">
+            <img class="paris-poster" src="../300127.webp" alt="Le Concert du Siècle — Adidas Arena">
+        </div>
 
-                    <a href="https://tix.to/saez2027AR/janph" class="reserve-btn">
-                        <img src="reserver.webp" alt="Réserver">
-                    </a>
+        <!-- ROW 2 gauche : dates tournée -->
+        <div class="zone-dates col-left">
+            <div class="col-label">Tournée 2026</div>
+            <div class="dates-list">
+                <div class="date-item">
+                    <span class="date-d">12/11</span>
+                    <span class="date-city">Amiens</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">14/11</span>
+                    <span class="date-city">Reims</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">18/11</span>
+                    <span class="date-city">Clermont-Ferrand</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">19/11</span>
+                    <span class="date-city">Nantes</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">24/11</span>
+                    <span class="date-city">Rennes</span>
+                    <span class="date-venue">Liberté</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">25/11</span>
+                    <span class="date-city">Caen</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">26/11</span>
+                    <span class="date-city">Brest</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">28/11</span>
+                    <span class="date-city">Bordeaux</span>
+                    <span class="date-venue">Arkéa Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">01/12</span>
+                    <span class="date-city">Grenoble</span>
+                    <span class="date-venue">Summum</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">03/12</span>
+                    <span class="date-city">Toulouse</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">04/12</span>
+                    <span class="date-city">Montpellier</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">05/12</span>
+                    <span class="date-city">Aix-en-Provence</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">08/12</span>
+                    <span class="date-city">Dijon</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">09/12</span>
+                    <span class="date-city">Lyon</span>
+                    <span class="date-venue">LDLC Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">11/12</span>
+                    <span class="date-city">Lille</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">12/12</span>
+                    <span class="date-city">Amnéville</span>
+                    <span class="date-venue">Galaxie</span>
                 </div>
             </div>
-
         </div>
+
+        <!-- ROW 3 gauche : bouton tournée -->
+        <div class="zone-btn-tour col-left">
+            <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="cta-button">
+                Réserver
+            </a>
+        </div>
+
+        <!-- ROW 2 droite : info Paris -->
+        <div class="zone-paris-info col-right">
+            <span class="paris-label">Paris — 30.01.2027</span>
+        </div>
+
+        <!-- ROW 3 droite : bouton Paris -->
+        <div class="zone-btn-paris col-right">
+            <a href="https://tix.to/saez2027AR/janph" class="reserve-btn">
+                <img src="../reserver.webp" alt="Réserver">
+            </a>
+        </div>
+
     </div>
 </body>
 </html>
