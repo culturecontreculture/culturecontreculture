@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture contre culture - SAEZ - Damien Saez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /*
+         *  Grid 3 lignes × 2 colonnes — centré dans le viewport
+         *  row 1 : slideshow 40vh  |  poster 40vh   (même hauteur)
+         *  row 2 : dates auto      |  info Paris    (hauteur naturelle)
+         *  row 3 : bouton          |  bouton
+         */
+
+        .page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 40vh auto auto;
+            width: 100%;
+        }
+
+        /* Séparateur vertical */
+        .col-left  { border-right: 1px solid rgba(106, 47, 47, 0.22); }
+        .col-right { border-left:  1px solid rgba(106, 47, 47, 0.22); margin-left: -1px; }
+
+        /* ============================
+           ROW 1 gauche — SLIDESHOW
+        ============================= */
+
+        .zone-slideshow {
+            grid-column: 1;
+            grid-row: 1;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 40px;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .slide:nth-child(1) img {
+            filter: drop-shadow(0 0 50px rgba(139, 0, 0, 0.25));
+        }
+
+        .slide:nth-child(2) {
+            opacity: 0;
+            animation: fadeInOut 10s infinite 3s;
+        }
+
+        @keyframes fadeInOut {
+            0%   { opacity: 0; }
+            10%  { opacity: 1; }
+            40%  { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ============================
+           ROW 1+2 droite — POSTER (span)
+        ============================= */
+
+        .zone-poster {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 48px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        /* ============================
+           ROW 2 droite — INFO PARIS
+        ============================= */
+
+        .zone-paris-info {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 48px;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .paris-poster {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
+            filter: drop-shadow(0 0 40px rgba(140, 0, 0, 0.25));
+        }
+
+        /* ============================
+           ROW 2 gauche — DATES
+        ============================= */
+
+        .zone-dates {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 24px 40px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .col-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .dates-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+        }
+
+        .date-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .date-d {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            color: #555;
+            font-weight: 300;
+        }
+
+        .date-city {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6a2f2f;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .date-venue {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ============================
+           ROW 3 — BOUTONS
+        ============================= */
+
+        .zone-btn-tour {
+            grid-column: 1;
+            grid-row: 3;
+        }
+
+        .zone-btn-paris {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .zone-btn-tour,
+        .zone-btn-paris {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 22px 40px;
+        }
+
+        .paris-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #3d1f1f 0%, #2d1515 100%);
+            border: 1px solid rgba(106, 47, 47, 0.3);
+            color: #967a7a;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before { left: 100%; }
+
+        .cta-button:hover {
+            background: linear-gradient(135deg, #4d2525 0%, #3d1b1b 100%);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            transform: translateY(-2px);
+            color: #a68a8a;
+        }
+
+        .reserve-btn {
+            display: block;
+            cursor: pointer;
+            opacity: 0.70;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .reserve-btn img {
+            display: block;
+            width: 140px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .reserve-btn:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 10px rgba(160, 0, 0, 0.4));
+        }
+
+        /* ============================
+           RESPONSIVE
+        ============================= */
+
+        @media (max-width: 860px) {
+            .slide,
+            .zone-poster,
+            .zone-dates,
+            .zone-btn-tour,
+            .zone-btn-paris {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body { align-items: stretch; }
+
+            .page {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .zone-poster     { order: 1; height: 80vw; border-bottom: none; padding: 16px; }
+            .zone-paris-info { order: 2; }
+            .zone-btn-paris  { order: 3; border-bottom: 1px solid rgba(106,47,47,0.2); }
+            .zone-slideshow  { order: 4; height: 80vw; border-bottom: none; }
+            .zone-dates      { order: 5; }
+            .zone-btn-tour   { order: 6; }
+
+            .zone-poster .paris-poster {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+
+            .slide { padding: 16px; }
+            .slide img {
+                object-fit: contain;
+            }
+
+            .col-left  { border-right: none; }
+            .col-right { border-left: none; margin-left: 0; }
+
+            .cta-button { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <!-- ROW 1 gauche : slideshow -->
+        <div class="zone-slideshow col-left">
+            <div class="slide">
+                <img src="../001.jpg" alt="Les Maudits">
+            </div>
+            <div class="slide">
+                <img src="../002.jpg" alt="Les Mots Dits">
+            </div>
+        </div>
+
+        <!-- ROW 1+2 droite : poster Paris -->
+        <div class="zone-poster col-right">
+            <img class="paris-poster" src="../300127.webp" alt="Le Concert du Siècle — Adidas Arena">
+        </div>
+
+        <!-- ROW 2 gauche : dates tournée -->
+        <div class="zone-dates col-left">
+            <div class="col-label">Tournée 2026</div>
+            <div class="dates-list">
+                <div class="date-item">
+                    <span class="date-d">12/11</span>
+                    <span class="date-city">Amiens</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">14/11</span>
+                    <span class="date-city">Reims</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">18/11</span>
+                    <span class="date-city">Clermont-Ferrand</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">19/11</span>
+                    <span class="date-city">Nantes</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">24/11</span>
+                    <span class="date-city">Rennes</span>
+                    <span class="date-venue">Liberté</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">25/11</span>
+                    <span class="date-city">Caen</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">26/11</span>
+                    <span class="date-city">Brest</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">28/11</span>
+                    <span class="date-city">Bordeaux</span>
+                    <span class="date-venue">Arkéa Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">01/12</span>
+                    <span class="date-city">Grenoble</span>
+                    <span class="date-venue">Summum</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">03/12</span>
+                    <span class="date-city">Toulouse</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">04/12</span>
+                    <span class="date-city">Montpellier</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">05/12</span>
+                    <span class="date-city">Aix-en-Provence</span>
+                    <span class="date-venue">Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">08/12</span>
+                    <span class="date-city">Dijon</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">09/12</span>
+                    <span class="date-city">Lyon</span>
+                    <span class="date-venue">LDLC Arena</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">11/12</span>
+                    <span class="date-city">Lille</span>
+                    <span class="date-venue">Zénith</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-d">12/12</span>
+                    <span class="date-city">Amnéville</span>
+                    <span class="date-venue">Galaxie</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3 gauche : bouton tournée -->
+        <div class="zone-btn-tour col-left">
+            <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="cta-button">
+                Réserver
+            </a>
+        </div>
+
+        <!-- ROW 2 droite : info Paris -->
+        <div class="zone-paris-info col-right">
+            <span class="paris-label">Paris — 30.01.2027</span>
+        </div>
+
+        <!-- ROW 3 droite : bouton Paris -->
+        <div class="zone-btn-paris col-right">
+            <a href="https://tix.to/saez2027AR/janph" class="reserve-btn">
+                <img src="../reserver.webp" alt="Réserver">
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>
