@@ -108,8 +108,26 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 48px;
+            padding: 20px 48px;
             border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .video-wrap {
+            width: 78%;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(106, 47, 47, 0.2);
+            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.15);
+        }
+
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .paris-poster {
@@ -130,6 +148,7 @@
             grid-row: 2;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
             padding: 24px 40px;
             overflow: hidden;
@@ -144,11 +163,13 @@
             color: #6a2f2f;
             font-weight: 600;
             margin-bottom: 16px;
+            text-align: center;
         }
 
         .dates-list {
             display: flex;
             flex-wrap: wrap;
+            justify-content: center;
             gap: 8px 18px;
         }
 
@@ -296,7 +317,7 @@
             }
 
             .zone-poster     { order: 1; height: 80vw; border-bottom: none; padding: 16px; }
-            .zone-paris-info { order: 2; }
+            .zone-paris-info { order: 2; display: none; }
             .zone-btn-paris  { order: 3; border-bottom: 1px solid rgba(106,47,47,0.2); }
             .zone-slideshow  { order: 4; height: 80vw; border-bottom: none; }
             .zone-dates      { order: 5; }
@@ -326,16 +347,16 @@
         <!-- ROW 1 gauche : slideshow -->
         <div class="zone-slideshow col-left">
             <div class="slide">
-                <img src="../001.jpg" alt="Les Maudits">
+                <img src="001.jpg" alt="Les Maudits">
             </div>
             <div class="slide">
-                <img src="../002.jpg" alt="Les Mots Dits">
+                <img src="002.jpg" alt="Les Mots Dits">
             </div>
         </div>
 
         <!-- ROW 1+2 droite : poster Paris -->
         <div class="zone-poster col-right">
-            <img class="paris-poster" src="../300127.webp" alt="Le Concert du Siècle — Adidas Arena">
+            <img class="paris-poster" src="300127.webp" alt="Le Concert du Siècle — Adidas Arena">
         </div>
 
         <!-- ROW 2 gauche : dates tournée -->
@@ -432,15 +453,22 @@
             </a>
         </div>
 
-        <!-- ROW 2 droite : info Paris -->
+        <!-- ROW 2 droite : vidéo Paris -->
         <div class="zone-paris-info col-right">
-            <span class="paris-label">Paris — 30.01.2027</span>
+            <div class="video-wrap">
+                <iframe
+                    src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1"
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
         </div>
 
         <!-- ROW 3 droite : bouton Paris -->
         <div class="zone-btn-paris col-right">
             <a href="https://tix.to/saez2027AR/gwjyb" class="reserve-btn">
-                <img src="../reserver.webp" alt="Réserver">
+                <img src="reserver.webp" alt="Réserver">
             </a>
         </div>
 
