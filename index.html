@@ -118,47 +118,93 @@
         ============================= */
 
         .zone-audio {
-            padding: 16px 40px;
+            padding: 20px 40px;
             border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+            display: flex;
+            justify-content: center;
         }
 
-        .zone-audio audio {
+        .audio-player {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             width: 100%;
-            height: 36px;
-            border-radius: 4px;
-            outline: none;
-            background: #0a0a0a;
-        }
-
-        /* Custom audio styling via filter */
-        .zone-audio audio::-webkit-media-controls-panel {
-            background: #0f0a0a;
-        }
-
-        .audio-label {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10px;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: #6a2f2f;
-            margin-bottom: 8px;
-        }
-
-        .audio-wrapper {
+            max-width: 480px;
             background: #0c0808;
             border: 1px solid rgba(106, 47, 47, 0.3);
-            border-radius: 4px;
-            padding: 12px 14px;
+            border-radius: 6px;
+            padding: 14px 20px;
             box-shadow: 0 2px 12px rgba(100, 0, 0, 0.1);
         }
 
+        .audio-play-btn {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #8b0000;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 0 16px rgba(139, 0, 0, 0.4);
+        }
+
+        .audio-play-btn:hover {
+            background: #a80000;
+            transform: scale(1.08);
+        }
+
+        .audio-play-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+            margin-left: 3px; /* optical centering for play icon */
+        }
+
+        .audio-play-btn.playing svg { margin-left: 0; }
+
+        .audio-track {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .audio-progress {
+            width: 100%;
+            height: 3px;
+            background: rgba(106, 47, 47, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .audio-progress-fill {
+            height: 100%;
+            background: #8b0000;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+            pointer-events: none;
+        }
+
+        .audio-time {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            color: #6a2f2f;
+            letter-spacing: 0.1em;
+        }
+
         /* ============================
-           MEDIA ROW (text + photo)
+           MEDIA BLOCKS (text + photo stacked)
         ============================= */
 
         .zone-media-row {
-            display: flex;
-            gap: 0;
+            display: block;
             border-bottom: 1px solid rgba(106, 47, 47, 0.15);
         }
 
@@ -167,42 +213,36 @@
         }
 
         .block-text {
-            flex: 1;
-            padding: 20px 24px;
+            padding: 24px 40px;
             background: #060404;
-            border-right: 1px solid rgba(106, 47, 47, 0.15);
+            text-align: center;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.1);
         }
+
+        .block-text:last-child { border-bottom: none; }
 
         .block-text .text-content {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            line-height: 1.7;
+            font-size: 13px;
+            line-height: 1.8;
             color: #9a6060;
             white-space: pre-wrap;
             word-break: break-word;
+            text-align: center;
         }
 
         .block-photo {
-            flex: 1;
-            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-height: 420px;
             overflow: hidden;
-            position: relative;
         }
 
         .block-photo img {
-            position: absolute;
-            inset: 0;
             width: 100%;
             height: 100%;
+            max-height: 420px;
             object-fit: cover;
             display: block;
-            box-shadow: inset 0 0 0 1px rgba(106, 47, 47, 0.2);
-        }
-
-        /* When only one of text/photo is visible, take full width */
-        .zone-media-row .block-text.zone-hidden + .block-photo {
-            flex: 1;
-            border-right: none;
         }
 
         /* ============================
@@ -474,11 +514,15 @@
 
             <!-- 2. Audio (dynamic) -->
             <div class="zone zone-audio zone-hidden" data-id="left_audio">
-                <div class="audio-wrapper">
-                    <div class="audio-label">Écouter</div>
-                    <audio controls preload="none">
-                        <source src="" type="audio/mpeg">
-                    </audio>
+                <div class="audio-player">
+                    <button class="audio-play-btn" aria-label="Play">
+                        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                    </button>
+                    <div class="audio-track">
+                        <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+                        <span class="audio-time">0:00</span>
+                    </div>
+                    <audio preload="none"><source src="" type="audio/mpeg"></audio>
                 </div>
             </div>
 
@@ -680,7 +724,7 @@
                     var source = audioZone.querySelector('audio source');
                     var audio  = audioZone.querySelector('audio');
                     if (source) source.src = content;
-                    if (audio)  audio.load();
+                    if (audio)  { audio.load(); initAudioPlayer(audioZone); }
                     audioZone.classList.remove('zone-hidden');
                 }
                 return;
@@ -738,6 +782,47 @@
             .catch(function (err) {
                 // Silent fail — site still works without dynamic content
                 console.warn('[CCC] Content load failed:', err.message);
+            });
+        }
+
+        function fmt(s) {
+            var m = Math.floor(s / 60);
+            var sec = Math.floor(s % 60);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function initAudioPlayer(zone) {
+            var audio   = zone.querySelector('audio');
+            var btn     = zone.querySelector('.audio-play-btn');
+            var fill    = zone.querySelector('.audio-progress-fill');
+            var bar     = zone.querySelector('.audio-progress');
+            var timeEl  = zone.querySelector('.audio-time');
+            var playIcon = '<polygon points="5,3 19,12 5,21"/>';
+            var pauseIcon = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
+
+            btn.addEventListener('click', function () {
+                if (audio.paused) { audio.play(); } else { audio.pause(); }
+            });
+            audio.addEventListener('play', function () {
+                btn.classList.add('playing');
+                btn.querySelector('svg').innerHTML = pauseIcon;
+            });
+            audio.addEventListener('pause', function () {
+                btn.classList.remove('playing');
+                btn.querySelector('svg').innerHTML = playIcon;
+            });
+            audio.addEventListener('timeupdate', function () {
+                if (!audio.duration) return;
+                fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+                timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+            });
+            audio.addEventListener('ended', function () {
+                fill.style.width = '0%';
+                timeEl.textContent = '0:00';
+            });
+            bar.addEventListener('click', function (e) {
+                var rect = bar.getBoundingClientRect();
+                audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
             });
         }
 
