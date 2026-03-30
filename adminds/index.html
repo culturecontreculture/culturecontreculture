@@ -457,6 +457,7 @@
     </style>
 </head>
 <body>
+    <div id="ccc-debug" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9999;padding:8px 16px;border-radius:4px;font-family:monospace;font-size:12px;color:#fff;max-width:90vw;text-align:center;"></div>
     <div class="page">
 
         <!-- ==================== LEFT COLUMN ==================== -->
@@ -718,13 +719,20 @@
             }
         }
 
+        function showDebug(msg, ok) {
+            var d = document.getElementById('ccc-debug');
+            if (!d) return;
+            d.textContent = msg;
+            d.style.background = ok ? 'rgba(0,80,0,0.85)' : 'rgba(120,0,0,0.85)';
+            d.style.display = 'block';
+        }
+
         function loadContent() {
-            var url = SUPABASE_URL + '/rest/v1/content_blocks?visible=eq.true&select=id,type,col,content';
+            var url = SUPABASE_URL + '/rest/v1/content_blocks?select=id,type,col,content,visible';
             fetch(url, {
                 headers: {
                     'apikey':        SUPABASE_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_KEY,
-                    'Content-Type':  'application/json'
+                    'Authorization': 'Bearer ' + SUPABASE_KEY
                 }
             })
             .then(function (res) {
@@ -732,13 +740,14 @@
                 return res.json();
             })
             .then(function (blocks) {
-                blocks.forEach(function (block) {
+                var visible = blocks.filter(function(b){ return b.visible && b.content; });
+                showDebug('Supabase OK — ' + blocks.length + ' blocs trouvés, ' + visible.length + ' visible(s) : ' + visible.map(function(b){ return b.id; }).join(', '), true);
+                visible.forEach(function (block) {
                     applyBlock(block);
                 });
             })
             .catch(function (err) {
-                // Silent fail — site still works without dynamic content
-                console.warn('[CCC] Content load failed:', err.message);
+                showDebug('Erreur Supabase : ' + err.message, false);
             });
         }
 
