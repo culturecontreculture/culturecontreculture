@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration — Culture contre Culture</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg:        #0a0a0a;
+            --bg2:       #0f0d0d;
+            --bg3:       #141010;
+            --border:    rgba(106, 47, 47, 0.25);
+            --border2:   rgba(106, 47, 47, 0.4);
+            --red:       #6a2f2f;
+            --red-light: #8a4040;
+            --red-dark:  #4a1f1f;
+            --text:      #c8b8b8;
+            --text-dim:  #7a6060;
+            --text-muted:#4a3535;
+            --success:   #2a5a2a;
+            --success-t: #5a9a5a;
+            --error:     #5a1a1a;
+            --error-t:   #c05050;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-mono);
+        }
+
+        /* ============================
+           PASSWORD SCREEN
+        ============================= */
+
+        #pw-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        #pw-screen.hidden {
+            display: none;
+        }
+
+        .pw-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 340px;
+            padding: 48px 40px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+
+        .pw-logo {
+            font-size: 10px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .pw-title {
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .pw-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            outline: none;
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+
+        .pw-input:focus {
+            border-color: var(--red);
+        }
+
+        .pw-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--red-dark);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pw-btn:hover {
+            background: var(--red);
+            color: var(--text);
+        }
+
+        .pw-error {
+            font-size: 11px;
+            color: var(--error-t);
+            letter-spacing: 0.1em;
+            text-align: center;
+            min-height: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .pw-error.visible {
+            opacity: 1;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%       { transform: translateX(-8px); }
+            40%       { transform: translateX(8px); }
+            60%       { transform: translateX(-6px); }
+            80%       { transform: translateX(6px); }
+        }
+
+        .pw-box.shake {
+            animation: shake 0.4s ease;
+        }
+
+        /* ============================
+           ADMIN INTERFACE
+        ============================= */
+
+        #admin {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #admin.visible {
+            display: flex;
+        }
+
+        /* Header */
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .admin-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .admin-logo {
+            font-size: 9px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--red);
+        }
+
+        .admin-title {
+            font-size: 15px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+
+        .admin-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-site {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 7px 14px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .btn-site:hover {
+            color: var(--text);
+            border-color: var(--border2);
+        }
+
+        .btn-logout {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 7px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            color: var(--error-t);
+            border-color: var(--error);
+        }
+
+        /* Main grid */
+        .admin-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            flex: 1;
+        }
+
+        .admin-col {
+            padding: 32px 28px;
+        }
+
+        .admin-col-left {
+            border-right: 1px solid var(--border);
+        }
+
+        .admin-col-title {
+            font-size: 10px;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 24px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--border2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg3);
+        }
+
+        .card-title {
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        /* Toggle switch */
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .toggle-label.on {
+            color: var(--red-light);
+        }
+
+        .toggle {
+            position: relative;
+            width: 38px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-track {
+            position: absolute;
+            inset: 0;
+            background: #1a1212;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.25s;
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 12px;
+            height: 12px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.25s;
+        }
+
+        .toggle input:checked ~ .toggle-track {
+            background: var(--red-dark);
+            border-color: var(--red);
+        }
+
+        .toggle input:checked ~ .toggle-thumb {
+            transform: translateX(18px);
+            background: var(--red-light);
+        }
+
+        /* Card body */
+        .card-body {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Preview */
+        .preview {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 10px 12px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview.hidden {
+            display: none;
+        }
+
+        .preview-none {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+        }
+
+        .preview audio {
+            width: 100%;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 80px;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+
+        .preview-text {
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .preview-yt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-yt img {
+            width: 80px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 2px;
+            border: 1px solid var(--border);
+        }
+
+        .preview-yt-id {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+
+        /* Inputs */
+        .field-label {
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .text-input,
+        .url-input,
+        .yt-input {
+            width: 100%;
+            padding: 9px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+            resize: vertical;
+        }
+
+        .text-input {
+            min-height: 80px;
+        }
+
+        .text-input:focus,
+        .url-input:focus,
+        .yt-input:focus {
+            border-color: var(--red);
+        }
+
+        /* File upload */
+        .file-upload-area {
+            border: 1px dashed var(--border);
+            border-radius: 3px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--red);
+            background: rgba(106, 47, 47, 0.05);
+        }
+
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-upload-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        .file-upload-name {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            display: none;
+            height: 3px;
+            background: var(--bg);
+            border-radius: 2px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-wrap.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--red);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Save button + feedback */
+        .save-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-save {
+            padding: 9px 20px;
+            background: var(--red-dark);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-save:hover {
+            background: var(--red);
+            color: var(--text);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feedback.success {
+            color: var(--success-t);
+            opacity: 1;
+        }
+
+        .feedback.error {
+            color: var(--error-t);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .admin-body {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-col-left {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .admin-col {
+                padding: 20px 16px;
+            }
+
+            .admin-header {
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD SCREEN ==================== -->
+    <div id="pw-screen">
+        <div class="pw-box" id="pw-box">
+            <div class="pw-logo">Culture contre Culture</div>
+            <div class="pw-title">Administration</div>
+            <input
+                type="password"
+                class="pw-input"
+                id="pw-input"
+                placeholder="Mot de passe"
+                autocomplete="current-password"
+            >
+            <div class="pw-error" id="pw-error">Mot de passe incorrect</div>
+            <button class="pw-btn" id="pw-btn">Entrer</button>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN INTERFACE ==================== -->
+    <div id="admin">
+
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <span class="admin-logo">Culture contre Culture</span>
+                <span class="admin-title">Administration</span>
+            </div>
+            <div class="admin-header-right">
+                <a href="index.html" target="_blank" class="btn-site">Voir le site</a>
+                <button class="btn-logout" id="btn-logout">Déconnexion</button>
+            </div>
+        </header>
+
+        <div class="admin-body">
+
+            <!-- LEFT: Tournée -->
+            <div class="admin-col admin-col-left">
+                <div class="admin-col-title">Tournée des Maudits</div>
+
+                <!-- Musique left -->
+                <div class="card" data-id="left_audio">
+                    <div class="card-header">
+                        <span class="card-title">Musique</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucun fichier</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Fichier audio (MP3, WAV, OGG)</div>
+                            <div class="file-upload-area">
+                                <input type="file" accept="audio/*" data-file>
+                                <div class="file-upload-hint">Cliquer pour choisir un fichier</div>
+                                <div class="file-upload-name" data-filename></div>
+                            </div>
+                        </div>
+                        <div class="progress-wrap" data-progress-wrap>
+                            <div class="progress-bar" data-progress-bar></div>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Texte left -->
+                <div class="card" data-id="left_text">
+                    <div class="card-header">
+                        <span class="card-title">Texte</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucun texte</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Contenu</div>
+                            <textarea class="text-input" data-text placeholder="Entrez votre texte ici..."></textarea>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo left -->
+                <div class="card" data-id="left_photo">
+                    <div class="card-header">
+                        <span class="card-title">Photo</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucune photo</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Image (JPG, PNG, WEBP)</div>
+                            <div class="file-upload-area">
+                                <input type="file" accept="image/*" data-file>
+                                <div class="file-upload-hint">Cliquer pour choisir une image</div>
+                                <div class="file-upload-name" data-filename></div>
+                            </div>
+                        </div>
+                        <div class="progress-wrap" data-progress-wrap>
+                            <div class="progress-bar" data-progress-bar></div>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vidéo left -->
+                <div class="card" data-id="left_youtube">
+                    <div class="card-header">
+                        <span class="card-title">Vidéo YouTube</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucune vidéo</span>
+                        </div>
+                        <div>
+                            <div class="field-label">URL ou ID YouTube</div>
+                            <input type="text" class="yt-input" data-yt placeholder="https://www.youtube.com/watch?v=... ou ID seul">
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /left col -->
+
+            <!-- RIGHT: Paris -->
+            <div class="admin-col admin-col-right">
+                <div class="admin-col-title">Paris — Adidas Arena</div>
+
+                <!-- Musique right -->
+                <div class="card" data-id="right_audio">
+                    <div class="card-header">
+                        <span class="card-title">Musique</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucun fichier</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Fichier audio (MP3, WAV, OGG)</div>
+                            <div class="file-upload-area">
+                                <input type="file" accept="audio/*" data-file>
+                                <div class="file-upload-hint">Cliquer pour choisir un fichier</div>
+                                <div class="file-upload-name" data-filename></div>
+                            </div>
+                        </div>
+                        <div class="progress-wrap" data-progress-wrap>
+                            <div class="progress-bar" data-progress-bar></div>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Texte right -->
+                <div class="card" data-id="right_text">
+                    <div class="card-header">
+                        <span class="card-title">Texte</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucun texte</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Contenu</div>
+                            <textarea class="text-input" data-text placeholder="Entrez votre texte ici..."></textarea>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo right -->
+                <div class="card" data-id="right_photo">
+                    <div class="card-header">
+                        <span class="card-title">Photo</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucune photo</span>
+                        </div>
+                        <div>
+                            <div class="field-label">Image (JPG, PNG, WEBP)</div>
+                            <div class="file-upload-area">
+                                <input type="file" accept="image/*" data-file>
+                                <div class="file-upload-hint">Cliquer pour choisir une image</div>
+                                <div class="file-upload-name" data-filename></div>
+                            </div>
+                        </div>
+                        <div class="progress-wrap" data-progress-wrap>
+                            <div class="progress-bar" data-progress-bar></div>
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vidéo right -->
+                <div class="card" data-id="right_youtube">
+                    <div class="card-header">
+                        <span class="card-title">Vidéo YouTube</span>
+                        <div class="toggle-wrap">
+                            <span class="toggle-label" data-toggle-label>off</span>
+                            <label class="toggle">
+                                <input type="checkbox" data-toggle>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-thumb"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview" data-preview>
+                            <span class="preview-none">Aucune vidéo</span>
+                        </div>
+                        <div>
+                            <div class="field-label">URL ou ID YouTube</div>
+                            <input type="text" class="yt-input" data-yt placeholder="https://www.youtube.com/watch?v=... ou ID seul">
+                        </div>
+                        <div class="save-row">
+                            <button class="btn-save" data-save>Enregistrer</button>
+                            <span class="feedback" data-feedback></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /right col -->
+
+        </div><!-- /admin-body -->
+
+    </div><!-- /admin -->
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ────────────────────────────────────────────────
+           CONFIG
+        ──────────────────────────────────────────────── */
+        var SUPABASE_URL  = 'https://cciypmugbemibaeuppco.supabase.co';
+        var SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaXlwbXVnYmVtaWJhZXVwcGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY1NzE3NjEsImV4cCI6MjA0MjE0Nzc2MX0.Jz6v2Akm17_xtPw14w6RaaPV4oQ-dEGpqJhJxEd2BCo';
+        var ADMIN_PASS    = 'l0nes0mepir4te!';
+        var SESSION_KEY   = 'ccc_admin_auth';
+
+        /* ────────────────────────────────────────────────
+           SUPABASE CLIENT
+        ──────────────────────────────────────────────── */
+        var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* ────────────────────────────────────────────────
+           PASSWORD SCREEN
+        ──────────────────────────────────────────────── */
+        var pwScreen = document.getElementById('pw-screen');
+        var pwBox    = document.getElementById('pw-box');
+        var pwInput  = document.getElementById('pw-input');
+        var pwBtn    = document.getElementById('pw-btn');
+        var pwError  = document.getElementById('pw-error');
+        var adminEl  = document.getElementById('admin');
+
+        function showAdmin() {
+            pwScreen.classList.add('hidden');
+            adminEl.classList.add('visible');
+            loadAllBlocks();
+        }
+
+        function tryLogin() {
+            if (pwInput.value === ADMIN_PASS) {
+                sessionStorage.setItem(SESSION_KEY, '1');
+                showAdmin();
+            } else {
+                pwError.classList.add('visible');
+                pwBox.classList.remove('shake');
+                void pwBox.offsetWidth; // reflow to restart animation
+                pwBox.classList.add('shake');
+                pwInput.value = '';
+                pwInput.focus();
+            }
+        }
+
+        pwBtn.addEventListener('click', tryLogin);
+        pwInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') tryLogin();
+            pwError.classList.remove('visible');
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', function () {
+            sessionStorage.removeItem(SESSION_KEY);
+            pwScreen.classList.remove('hidden');
+            adminEl.classList.remove('visible');
+            pwInput.value = '';
+            pwError.classList.remove('visible');
+        });
+
+        // Check session
+        if (sessionStorage.getItem(SESSION_KEY) === '1') {
+            showAdmin();
+        }
+
+        /* ────────────────────────────────────────────────
+           YOUTUBE ID EXTRACTION
+        ──────────────────────────────────────────────── */
+        function extractYouTubeId(input) {
+            if (!input) return null;
+            input = input.trim();
+            // Already an ID (11 chars, alphanumeric + - _)
+            if (/^[A-Za-z0-9_-]{11}$/.test(input)) return input;
+            // watch?v=
+            var m = input.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+            if (m) return m[1];
+            // youtu.be/
+            m = input.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+            if (m) return m[1];
+            // /embed/
+            m = input.match(/\/embed\/([A-Za-z0-9_-]{11})/);
+            if (m) return m[1];
+            // /shorts/
+            m = input.match(/\/shorts\/([A-Za-z0-9_-]{11})/);
+            if (m) return m[1];
+            return null;
+        }
+
+        /* ────────────────────────────────────────────────
+           LOAD ALL BLOCKS
+        ──────────────────────────────────────────────── */
+        function loadAllBlocks() {
+            sb.from('content_blocks')
+              .select('*')
+              .then(function (res) {
+                  if (res.error) { console.error(res.error); return; }
+                  res.data.forEach(function (block) {
+                      populateCard(block);
+                  });
+              });
+        }
+
+        /* ────────────────────────────────────────────────
+           POPULATE A CARD WITH EXISTING DATA
+        ──────────────────────────────────────────────── */
+        function populateCard(block) {
+            var card = document.querySelector('.card[data-id="' + block.id + '"]');
+            if (!card) return;
+
+            var toggleInput = card.querySelector('[data-toggle]');
+            var toggleLabel = card.querySelector('[data-toggle-label]');
+            var preview     = card.querySelector('[data-preview]');
+
+            // Set toggle state
+            toggleInput.checked = !!block.visible;
+            updateToggleLabel(toggleLabel, toggleInput.checked);
+
+            // Set preview
+            renderPreview(card, block);
+
+            // Pre-fill text/yt input
+            if (block.type === 'text') {
+                var textarea = card.querySelector('[data-text]');
+                if (textarea && block.content) textarea.value = block.content;
+            }
+            if (block.type === 'youtube') {
+                var ytInput = card.querySelector('[data-yt]');
+                if (ytInput && block.content) ytInput.value = block.content;
+            }
+        }
+
+        function updateToggleLabel(el, checked) {
+            if (!el) return;
+            el.textContent = checked ? 'on' : 'off';
+            if (checked) el.classList.add('on');
+            else         el.classList.remove('on');
+        }
+
+        /* ────────────────────────────────────────────────
+           RENDER PREVIEW
+        ──────────────────────────────────────────────── */
+        function renderPreview(card, block) {
+            var preview = card.querySelector('[data-preview]');
+            if (!preview) return;
+
+            preview.innerHTML = '';
+
+            if (!block.content) {
+                var labels = {
+                    audio:   'Aucun fichier',
+                    text:    'Aucun texte',
+                    photo:   'Aucune photo',
+                    youtube: 'Aucune vidéo'
+                };
+                preview.innerHTML = '<span class="preview-none">' + (labels[block.type] || 'Vide') + '</span>';
+                return;
+            }
+
+            if (block.type === 'audio') {
+                var audio = document.createElement('audio');
+                audio.controls = true;
+                audio.preload = 'none';
+                audio.src = block.content;
+                audio.style.width = '100%';
+                preview.appendChild(audio);
+            }
+
+            if (block.type === 'photo') {
+                var img = document.createElement('img');
+                img.src = block.content;
+                img.className = 'preview-img';
+                img.alt = '';
+                preview.appendChild(img);
+            }
+
+            if (block.type === 'text') {
+                var p = document.createElement('div');
+                p.className = 'preview-text';
+                p.textContent = block.content;
+                preview.appendChild(p);
+            }
+
+            if (block.type === 'youtube') {
+                var wrap = document.createElement('div');
+                wrap.className = 'preview-yt';
+                var thumb = document.createElement('img');
+                thumb.src = 'https://img.youtube.com/vi/' + block.content + '/mqdefault.jpg';
+                thumb.alt = '';
+                var idSpan = document.createElement('span');
+                idSpan.className = 'preview-yt-id';
+                idSpan.textContent = block.content;
+                wrap.appendChild(thumb);
+                wrap.appendChild(idSpan);
+                preview.appendChild(wrap);
+            }
+        }
+
+        /* ────────────────────────────────────────────────
+           TOGGLE LISTENERS
+        ──────────────────────────────────────────────── */
+        document.querySelectorAll('.card').forEach(function (card) {
+            var id          = card.getAttribute('data-id');
+            var toggleInput = card.querySelector('[data-toggle]');
+            var toggleLabel = card.querySelector('[data-toggle-label]');
+            var saveBtn     = card.querySelector('[data-save]');
+            var feedbackEl  = card.querySelector('[data-feedback]');
+
+            // Toggle auto-saves visibility
+            toggleInput.addEventListener('change', function () {
+                updateToggleLabel(toggleLabel, toggleInput.checked);
+                sb.from('content_blocks')
+                  .update({ visible: toggleInput.checked })
+                  .eq('id', id)
+                  .then(function (res) {
+                      if (res.error) {
+                          showFeedback(feedbackEl, false, 'Erreur toggle');
+                      } else {
+                          showFeedback(feedbackEl, true, 'Visibilité mise à jour');
+                      }
+                  });
+            });
+
+            // File input label update
+            var fileInput = card.querySelector('[data-file]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    var fn = card.querySelector('[data-filename]');
+                    if (fn && fileInput.files[0]) {
+                        fn.textContent = fileInput.files[0].name;
+                    }
+                });
+            }
+
+            // Save button
+            saveBtn.addEventListener('click', function () {
+                handleSave(card, id, saveBtn, feedbackEl);
+            });
+        });
+
+        /* ────────────────────────────────────────────────
+           HANDLE SAVE
+        ──────────────────────────────────────────────── */
+        function handleSave(card, id, btn, feedbackEl) {
+            var type = id.split('_')[1]; // audio | text | photo | youtube
+
+            if (type === 'text') {
+                var textarea = card.querySelector('[data-text]');
+                var val = textarea ? textarea.value.trim() : '';
+                if (!val) { showFeedback(feedbackEl, false, 'Texte vide'); return; }
+                updateBlock(id, val, btn, feedbackEl, card, { id: id, type: 'text', content: val });
+            }
+
+            else if (type === 'youtube') {
+                var ytInput = card.querySelector('[data-yt]');
+                var raw = ytInput ? ytInput.value.trim() : '';
+                var videoId = extractYouTubeId(raw);
+                if (!videoId) { showFeedback(feedbackEl, false, 'ID YouTube invalide'); return; }
+                ytInput.value = videoId;
+                updateBlock(id, videoId, btn, feedbackEl, card, { id: id, type: 'youtube', content: videoId });
+            }
+
+            else if (type === 'audio' || type === 'photo') {
+                var fileInput = card.querySelector('[data-file]');
+                if (!fileInput || !fileInput.files[0]) {
+                    showFeedback(feedbackEl, false, 'Aucun fichier sélectionné');
+                    return;
+                }
+                uploadFile(card, id, type, fileInput.files[0], btn, feedbackEl);
+            }
+        }
+
+        /* ────────────────────────────────────────────────
+           FILE UPLOAD
+        ──────────────────────────────────────────────── */
+        function uploadFile(card, id, type, file, btn, feedbackEl) {
+            var bucket      = (type === 'audio') ? 'audio' : 'photos';
+            var ext         = file.name.split('.').pop();
+            var path        = id + '_' + Date.now() + '.' + ext;
+            var progressWrap = card.querySelector('[data-progress-wrap]');
+            var progressBar  = card.querySelector('[data-progress-bar]');
+
+            btn.disabled = true;
+            if (progressWrap) progressWrap.classList.add('visible');
+            if (progressBar)  progressBar.style.width = '10%';
+
+            sb.storage
+              .from(bucket)
+              .upload(path, file, { upsert: true, cacheControl: '3600' })
+              .then(function (res) {
+                  if (res.error) {
+                      btn.disabled = false;
+                      if (progressWrap) progressWrap.classList.remove('visible');
+                      showFeedback(feedbackEl, false, res.error.message || 'Erreur upload');
+                      return;
+                  }
+
+                  if (progressBar) progressBar.style.width = '80%';
+
+                  var urlRes = sb.storage.from(bucket).getPublicUrl(path);
+                  var publicUrl = urlRes.data.publicUrl;
+
+                  if (progressBar) progressBar.style.width = '100%';
+
+                  updateBlock(id, publicUrl, btn, feedbackEl, card,
+                      { id: id, type: type, content: publicUrl },
+                      function () {
+                          if (progressWrap) {
+                              setTimeout(function () {
+                                  progressWrap.classList.remove('visible');
+                                  if (progressBar) progressBar.style.width = '0%';
+                              }, 800);
+                          }
+                      }
+                  );
+              });
+        }
+
+        /* ────────────────────────────────────────────────
+           UPDATE BLOCK IN SUPABASE
+        ──────────────────────────────────────────────── */
+        function updateBlock(id, content, btn, feedbackEl, card, blockForPreview, afterCb) {
+            sb.from('content_blocks')
+              .update({ content: content })
+              .eq('id', id)
+              .then(function (res) {
+                  btn.disabled = false;
+                  if (res.error) {
+                      showFeedback(feedbackEl, false, res.error.message || 'Erreur');
+                  } else {
+                      showFeedback(feedbackEl, true, 'Sauvegardé');
+                      renderPreview(card, blockForPreview);
+                      if (afterCb) afterCb();
+                  }
+              });
+        }
+
+        /* ────────────────────────────────────────────────
+           FEEDBACK HELPER
+        ──────────────────────────────────────────────── */
+        function showFeedback(el, success, msg) {
+            if (!el) return;
+            el.textContent = success ? (msg || 'Sauvegardé ✓') : (msg || 'Erreur');
+            el.className = 'feedback ' + (success ? 'success' : 'error');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(function () {
+                el.className = 'feedback';
+                el.textContent = '';
+            }, 3500);
+        }
+
+    })();
+    </script>
+
+</body>
+</html>

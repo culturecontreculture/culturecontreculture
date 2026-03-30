@@ -44,12 +44,16 @@ INSERT INTO content_blocks (id, type, col, content, visible) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- -------------------------------------------------------------
+--  Permissions explicites pour le rôle anon
+-- -------------------------------------------------------------
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT ALL ON content_blocks TO anon;
+
+-- -------------------------------------------------------------
 --  Row Level Security
 -- -------------------------------------------------------------
 ALTER TABLE content_blocks ENABLE ROW LEVEL SECURITY;
 
--- Allow full access for anonymous role
--- (frontend password in admin.html provides the security layer)
 DROP POLICY IF EXISTS "anon_all" ON content_blocks;
 CREATE POLICY "anon_all"
   ON content_blocks
@@ -59,22 +63,32 @@ CREATE POLICY "anon_all"
   WITH CHECK (true);
 
 -- -------------------------------------------------------------
---  Storage buckets — CREATE MANUALLY in Supabase dashboard
+--  Storage buckets + policies (tout en SQL, pas besoin du dashboard)
 -- -------------------------------------------------------------
--- 1. Go to Storage > New bucket
---    Name: photos
---    Public: YES
---    Allowed MIME types: image/*
---    Max file size: 20 MB
---
--- 2. Go to Storage > New bucket
---    Name: audio
---    Public: YES
---    Allowed MIME types: audio/*
---    Max file size: 50 MB
---
--- Then add a storage policy for each bucket:
---    Allowed operation: INSERT, SELECT, UPDATE, DELETE
---    Role: anon
---    Policy definition: true
--- -------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES
+  ('photos', 'photos', true, 20971520, ARRAY['image/jpeg','image/png','image/webp','image/gif']),
+  ('audio',  'audio',  true, 52428800, ARRAY['audio/mpeg','audio/mp3','audio/wav','audio/ogg','audio/mp4'])
+ON CONFLICT (id) DO NOTHING;
+
+-- Policies storage : lecture publique
+DROP POLICY IF EXISTS "photos_public_read"  ON storage.objects;
+DROP POLICY IF EXISTS "audio_public_read"   ON storage.objects;
+CREATE POLICY "photos_public_read" ON storage.objects FOR SELECT USING (bucket_id = 'photos');
+CREATE POLICY "audio_public_read"  ON storage.objects FOR SELECT USING (bucket_id = 'audio');
+
+-- Policies storage : écriture anon (protégée par le mot de passe admin côté frontend)
+DROP POLICY IF EXISTS "photos_anon_write" ON storage.objects;
+DROP POLICY IF EXISTS "audio_anon_write"  ON storage.objects;
+CREATE POLICY "photos_anon_write" ON storage.objects FOR INSERT TO anon WITH CHECK (bucket_id = 'photos');
+CREATE POLICY "audio_anon_write"  ON storage.objects FOR INSERT TO anon WITH CHECK (bucket_id = 'audio');
+
+DROP POLICY IF EXISTS "photos_anon_update" ON storage.objects;
+DROP POLICY IF EXISTS "audio_anon_update"  ON storage.objects;
+CREATE POLICY "photos_anon_update" ON storage.objects FOR UPDATE TO anon USING (bucket_id = 'photos');
+CREATE POLICY "audio_anon_update"  ON storage.objects FOR UPDATE TO anon USING (bucket_id = 'audio');
+
+DROP POLICY IF EXISTS "photos_anon_delete" ON storage.objects;
+DROP POLICY IF EXISTS "audio_anon_delete"  ON storage.objects;
+CREATE POLICY "photos_anon_delete" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'photos');
+CREATE POLICY "audio_anon_delete"  ON storage.objects FOR DELETE TO anon USING (bucket_id = 'audio');
