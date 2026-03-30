@@ -623,10 +623,13 @@
                 </div>
             </div>
 
-            <!-- 4. YouTube (dynamic) -->
-            <div class="zone zone-video zone-hidden" data-id="right_youtube">
+            <!-- 4. YouTube — statique par défaut, src remplacé si admin change la vidéo -->
+            <div class="zone zone-video" data-id="right_youtube">
                 <div class="video-wrap">
-                    <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe id="right-video-iframe"
+                        src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&rel=0&iv_load_policy=3"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
                 </div>
             </div>
 
@@ -662,18 +665,12 @@
             var content = block.content;
 
             if (type === 'youtube') {
-                // Dynamic YouTube zone
                 var videoZone = document.querySelector('.zone[data-id="' + id + '"]');
                 if (videoZone) {
                     var iframe = videoZone.querySelector('iframe');
-                    if (iframe) {
-                        iframe.src = buildYouTubeSrc(content);
-                    }
+                    if (iframe) iframe.src = buildYouTubeSrc(content);
                     videoZone.classList.remove('zone-hidden');
                 }
-
-                // Also update the static right video if it's right_youtube
-                // (the static iframe is already in the HTML, so this is the dynamic zone only)
                 return;
             }
 
