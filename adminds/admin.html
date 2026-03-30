@@ -1228,8 +1228,15 @@
            UPDATE BLOCK IN SUPABASE
         ──────────────────────────────────────────────── */
         function updateBlock(id, content, btn, feedbackEl, card, blockForPreview, afterCb) {
+            // Met aussi visible à true et coche le toggle
+            var toggleInput = card.querySelector('[data-toggle]');
+            var toggleLabel = card.querySelector('[data-toggle-label]');
+            if (toggleInput && !toggleInput.checked) {
+                toggleInput.checked = true;
+                updateToggleLabel(toggleLabel, true);
+            }
             sb.from('content_blocks')
-              .update({ content: content })
+              .update({ content: content, visible: true })
               .eq('id', id)
               .then(function (res) {
                   btn.disabled = false;
