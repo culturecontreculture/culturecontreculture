@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture contre culture - SAEZ - Damien Saez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /*
+         *  Grid — 2 colonnes
+         *  Chaque colonne est une flex-column avec les zones dynamiques intercalées
+         */
+
+        .page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            align-items: start;
+        }
+
+        /* Séparateur vertical */
+        .col-left  { border-right: 1px solid rgba(106, 47, 47, 0.22); }
+        .col-right { border-left:  1px solid rgba(106, 47, 47, 0.22); margin-left: -1px; }
+
+        /* Each column is a flex column */
+        .col-left,
+        .col-right {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================
+           VISUAL — SLIDESHOW & POSTER
+        ============================= */
+
+        .zone-slideshow {
+            position: relative;
+            overflow: hidden;
+            height: 40vh;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 40px;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .slide:nth-child(1) img {
+            filter: drop-shadow(0 0 50px rgba(139, 0, 0, 0.25));
+        }
+
+        .slide:nth-child(2) {
+            opacity: 0;
+            animation: fadeInOut 10s infinite 3s;
+        }
+
+        @keyframes fadeInOut {
+            0%   { opacity: 0; }
+            10%  { opacity: 1; }
+            40%  { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .zone-poster {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 48px;
+            overflow: hidden;
+            height: 40vh;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .paris-poster {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
+            filter: drop-shadow(0 0 40px rgba(140, 0, 0, 0.25));
+        }
+
+        /* ============================
+           ZONE HIDDEN (dynamic blocks)
+        ============================= */
+
+        .zone-hidden {
+            display: none !important;
+        }
+
+        /* ============================
+           AUDIO ZONE
+        ============================= */
+
+        .zone-audio {
+            padding: 16px 40px;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .zone-audio audio {
+            width: 100%;
+            height: 36px;
+            border-radius: 4px;
+            outline: none;
+            background: #0a0a0a;
+        }
+
+        /* Custom audio styling via filter */
+        .zone-audio audio::-webkit-media-controls-panel {
+            background: #0f0a0a;
+        }
+
+        .audio-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            margin-bottom: 8px;
+        }
+
+        .audio-wrapper {
+            background: #0c0808;
+            border: 1px solid rgba(106, 47, 47, 0.3);
+            border-radius: 4px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 12px rgba(100, 0, 0, 0.1);
+        }
+
+        /* ============================
+           MEDIA ROW (text + photo)
+        ============================= */
+
+        .zone-media-row {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .zone-media-row.row-hidden {
+            display: none;
+        }
+
+        .block-text {
+            flex: 1;
+            padding: 20px 24px;
+            background: #060404;
+            border-right: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .block-text .text-content {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #9a6060;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .block-photo {
+            flex: 1;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .block-photo img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            box-shadow: inset 0 0 0 1px rgba(106, 47, 47, 0.2);
+        }
+
+        /* When only one of text/photo is visible, take full width */
+        .zone-media-row .block-text.zone-hidden + .block-photo {
+            flex: 1;
+            border-right: none;
+        }
+
+        /* ============================
+           VIDEO ZONE
+        ============================= */
+
+        .zone-video {
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .video-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(106, 47, 47, 0.2);
+            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.15);
+        }
+
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ============================
+           DATES
+        ============================= */
+
+        .zone-dates {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 40px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .col-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .dates-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 18px;
+        }
+
+        .date-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .date-d {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #555;
+            font-weight: 300;
+        }
+
+        .date-city {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6a2f2f;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .date-venue {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ============================
+           PARIS INFO (video wrapper)
+        ============================= */
+
+        .zone-paris-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 48px;
+            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+        }
+
+        .zone-paris-info .video-wrap {
+            width: 78%;
+        }
+
+        /* ============================
+           BOUTONS
+        ============================= */
+
+        .zone-btn-tour,
+        .zone-btn-paris {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 22px 40px;
+        }
+
+        .paris-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6a2f2f;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #3d1f1f 0%, #2d1515 100%);
+            border: 1px solid rgba(106, 47, 47, 0.3);
+            color: #967a7a;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before { left: 100%; }
+
+        .cta-button:hover {
+            background: linear-gradient(135deg, #4d2525 0%, #3d1b1b 100%);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            transform: translateY(-2px);
+            color: #a68a8a;
+        }
+
+        .reserve-btn {
+            display: block;
+            cursor: pointer;
+            opacity: 0.70;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .reserve-btn img {
+            display: block;
+            width: 140px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .reserve-btn:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 10px rgba(160, 0, 0, 0.4));
+        }
+
+        /* ============================
+           RESPONSIVE
+        ============================= */
+
+        @media (max-width: 860px) {
+            .slide,
+            .zone-poster,
+            .zone-dates,
+            .zone-btn-tour,
+            .zone-btn-paris,
+            .zone-audio,
+            .zone-video {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .zone-paris-info {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .zone-paris-info .video-wrap {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body { align-items: stretch; }
+
+            .page {
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Right column (Paris) first */
+            .col-right { order: 1; }
+            .col-left  { order: 2; }
+
+            .col-left  { border-right: none; }
+            .col-right { border-left: none; margin-left: 0; }
+
+            .zone-poster     { height: 80vw; border-bottom: none; padding: 16px; }
+            .zone-paris-info { padding: 16px 24px; border-bottom: none; }
+            .zone-paris-info .video-wrap { width: 100%; }
+
+            .zone-slideshow  { height: 80vw; border-bottom: none; }
+
+            .slide { padding: 16px; }
+            .slide img { object-fit: contain; }
+
+            .zone-poster .paris-poster {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+
+            .zone-audio { padding: 14px 16px; }
+            .zone-video { padding: 14px 16px; }
+
+            .block-text { padding: 14px 16px; }
+
+            .cta-button { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <!-- ==================== LEFT COLUMN ==================== -->
+        <div class="col-left">
+
+            <!-- 1. Slideshow (unchanged) -->
+            <div class="zone-slideshow">
+                <div class="slide">
+                    <img src="../001.jpg" alt="Les Maudits">
+                </div>
+                <div class="slide">
+                    <img src="../002.jpg" alt="Les Mots Dits">
+                </div>
+            </div>
+
+            <!-- 2. Audio (dynamic) -->
+            <div class="zone zone-audio zone-hidden" data-id="left_audio">
+                <div class="audio-wrapper">
+                    <div class="audio-label">Écouter</div>
+                    <audio controls preload="none">
+                        <source src="" type="audio/mpeg">
+                    </audio>
+                </div>
+            </div>
+
+            <!-- 3. Text + Photo (dynamic, side by side) -->
+            <div class="zone-media-row row-hidden" data-media="left">
+                <div class="block-text zone-hidden" data-id="left_text">
+                    <p class="text-content"></p>
+                </div>
+                <div class="block-photo zone-hidden" data-id="left_photo">
+                    <img src="" alt="">
+                </div>
+            </div>
+
+            <!-- 4. YouTube (dynamic) -->
+            <div class="zone zone-video zone-hidden" data-id="left_youtube">
+                <div class="video-wrap">
+                    <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- 5. Dates tournée (unchanged) -->
+            <div class="zone-dates">
+                <div class="col-label">Tournée 2026</div>
+                <div class="dates-list">
+                    <div class="date-item">
+                        <span class="date-d">12/11</span>
+                        <span class="date-city">Amiens</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">14/11</span>
+                        <span class="date-city">Reims</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">18/11</span>
+                        <span class="date-city">Clermont-Ferrand</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">19/11</span>
+                        <span class="date-city">Nantes</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">24/11</span>
+                        <span class="date-city">Rennes</span>
+                        <span class="date-venue">Liberté</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">25/11</span>
+                        <span class="date-city">Caen</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">26/11</span>
+                        <span class="date-city">Brest</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">28/11</span>
+                        <span class="date-city">Bordeaux</span>
+                        <span class="date-venue">Arkéa Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">01/12</span>
+                        <span class="date-city">Grenoble</span>
+                        <span class="date-venue">Summum</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">03/12</span>
+                        <span class="date-city">Toulouse</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">04/12</span>
+                        <span class="date-city">Montpellier</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">05/12</span>
+                        <span class="date-city">Aix-en-Provence</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">08/12</span>
+                        <span class="date-city">Dijon</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">09/12</span>
+                        <span class="date-city">Lyon</span>
+                        <span class="date-venue">LDLC Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">11/12</span>
+                        <span class="date-city">Lille</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">12/12</span>
+                        <span class="date-city">Amnéville</span>
+                        <span class="date-venue">Galaxie</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Bouton réserver (unchanged) -->
+            <div class="zone-btn-tour">
+                <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="cta-button">
+                    Réserver
+                </a>
+            </div>
+
+        </div><!-- /col-left -->
+
+        <!-- ==================== RIGHT COLUMN ==================== -->
+        <div class="col-right">
+
+            <!-- 1. Poster Paris (unchanged) -->
+            <div class="zone-poster">
+                <img class="paris-poster" src="../300127.webp" alt="Le Concert du Siècle — Adidas Arena">
+            </div>
+
+            <!-- 2. Audio (dynamic) -->
+            <div class="zone zone-audio zone-hidden" data-id="right_audio">
+                <div class="audio-wrapper">
+                    <div class="audio-label">Écouter</div>
+                    <audio controls preload="none">
+                        <source src="" type="audio/mpeg">
+                    </audio>
+                </div>
+            </div>
+
+            <!-- 3. Text + Photo (dynamic, side by side) -->
+            <div class="zone-media-row row-hidden" data-media="right">
+                <div class="block-text zone-hidden" data-id="right_text">
+                    <p class="text-content"></p>
+                </div>
+                <div class="block-photo zone-hidden" data-id="right_photo">
+                    <img src="" alt="">
+                </div>
+            </div>
+
+            <!-- 4. YouTube — statique par défaut, src remplacé si admin change la vidéo -->
+            <div class="zone zone-video" data-id="right_youtube">
+                <div class="video-wrap">
+                    <iframe id="right-video-iframe"
+                        src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&rel=0&iv_load_policy=3"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+
+
+            <!-- 6. Bouton réserver (unchanged) -->
+            <div class="zone-btn-paris">
+                <a href="https://tix.to/saez2027AR/gwjyb" class="reserve-btn">
+                    <img src="../reserver.webp" alt="Réserver">
+                </a>
+            </div>
+
+        </div><!-- /col-right -->
+
+    </div><!-- /page -->
+
+    <script>
+    (function () {
+        'use strict';
+
+        var SUPABASE_URL = 'https://cciypmugbemibaeuppco.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaXlwbXVnYmVtaWJhZXVwcGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY1NzE3NjEsImV4cCI6MjA0MjE0Nzc2MX0.Jz6v2Akm17_xtPw14w6RaaPV4oQ-dEGpqJhJxEd2BCo';
+        var YT_PARAMS   = 'autoplay=1&mute=1&rel=0&iv_load_policy=3';
+
+        function buildYouTubeSrc(videoId) {
+            return 'https://www.youtube.com/embed/' + videoId + '?' + YT_PARAMS;
+        }
+
+        function applyBlock(block) {
+            if (!block.content) return;
+
+            var id = block.id;
+            var type = block.type;
+            var content = block.content;
+
+            if (type === 'youtube') {
+                var videoZone = document.querySelector('.zone[data-id="' + id + '"]');
+                if (videoZone) {
+                    var iframe = videoZone.querySelector('iframe');
+                    if (iframe) iframe.src = buildYouTubeSrc(content);
+                    videoZone.classList.remove('zone-hidden');
+                }
+                return;
+            }
+
+            if (type === 'audio') {
+                var audioZone = document.querySelector('.zone[data-id="' + id + '"]');
+                if (audioZone) {
+                    var source = audioZone.querySelector('audio source');
+                    var audio  = audioZone.querySelector('audio');
+                    if (source) source.src = content;
+                    if (audio)  audio.load();
+                    audioZone.classList.remove('zone-hidden');
+                }
+                return;
+            }
+
+            if (type === 'text') {
+                var textBlock = document.querySelector('.block-text[data-id="' + id + '"]');
+                if (textBlock) {
+                    var p = textBlock.querySelector('.text-content');
+                    if (p) p.textContent = content;
+                    textBlock.classList.remove('zone-hidden');
+                    // Show parent media row
+                    var col = id.startsWith('left') ? 'left' : 'right';
+                    var row = document.querySelector('.zone-media-row[data-media="' + col + '"]');
+                    if (row) row.classList.remove('row-hidden');
+                }
+                return;
+            }
+
+            if (type === 'photo') {
+                var photoBlock = document.querySelector('.block-photo[data-id="' + id + '"]');
+                if (photoBlock) {
+                    var img = photoBlock.querySelector('img');
+                    if (img) {
+                        img.src = content;
+                        img.alt = '';
+                    }
+                    photoBlock.classList.remove('zone-hidden');
+                    // Show parent media row
+                    var col = id.startsWith('left') ? 'left' : 'right';
+                    var row = document.querySelector('.zone-media-row[data-media="' + col + '"]');
+                    if (row) row.classList.remove('row-hidden');
+                }
+                return;
+            }
+        }
+
+        function loadContent() {
+            var url = SUPABASE_URL + '/rest/v1/content_blocks?visible=eq.true&select=id,type,col,content';
+            fetch(url, {
+                headers: {
+                    'apikey':        SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY,
+                    'Content-Type':  'application/json'
+                }
+            })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (blocks) {
+                blocks.forEach(function (block) {
+                    applyBlock(block);
+                });
+            })
+            .catch(function (err) {
+                // Silent fail — site still works without dynamic content
+                console.warn('[CCC] Content load failed:', err.message);
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadContent);
+        } else {
+            loadContent();
+        }
+    })();
+    </script>
+</body>
+</html>
