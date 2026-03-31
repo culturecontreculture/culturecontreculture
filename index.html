@@ -254,10 +254,12 @@
         }
 
         .block-photo > img {
-            width: 100%;
+            max-width: 100%;
             max-height: 400px;
-            object-fit: contain;
+            width: auto;
+            height: auto;
             display: block;
+            margin: 0 auto;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
@@ -267,27 +269,36 @@
            GALLERY
         ============================= */
 
-        .gallery { position: relative; }
+        .gallery { width: 100%; }
+        .gallery-nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
         .gallery-stage {
-            position: relative; overflow: hidden;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .gallery-stage > img {
+            max-width: 100%;
+            max-height: 380px;
+            width: auto;
+            height: auto;
+            display: block;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
-        }
-        .gallery-stage > img {
-            width: 100%; max-height: 380px; object-fit: contain; display: block;
             transition: opacity 0.35s ease;
         }
         .gallery-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
+            flex-shrink: 0;
             background: rgba(139,0,0,0.75); color: #fff; border: none; cursor: pointer;
-            width: 36px; height: 36px; border-radius: 50%; font-size: 20px; line-height: 1;
+            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
             display: flex; align-items: center; justify-content: center;
             transition: background 0.2s;
         }
         .gallery-arrow:hover { background: rgba(139,0,0,1); }
-        .gallery-prev { left: 14px; }
-        .gallery-next { right: 14px; }
         .gallery-dots { display: flex; justify-content: center; gap: 8px; padding: 14px 0 4px; }
         .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(106,47,47,0.35); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
         .gallery-dot.active { background: #8b0000; }
@@ -934,12 +945,13 @@
 
         function renderGallery(block, urls) {
             var current = 0;
-            var html = '<div class="gallery"><div class="gallery-stage">';
-            if (urls.length > 1) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button>';
-            html += '<img src="'+urls[0]+'" alt="">';
-            if (urls.length > 1) html += '<button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
+            var multi = urls.length > 1;
+            var html = '<div class="gallery"><div class="gallery-nav">';
+            if (multi) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button>';
+            html += '<div class="gallery-stage"><img src="'+urls[0]+'" alt=""></div>';
+            if (multi) html += '<button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
             html += '</div>';
-            if (urls.length > 1) {
+            if (multi) {
                 html += '<div class="gallery-dots">';
                 urls.forEach(function(_,i){ html += '<button class="gallery-dot'+(i===0?' active':'')+'" data-di="'+i+'" type="button"></button>'; });
                 html += '</div>';
@@ -947,7 +959,7 @@
             html += '</div>';
             block.innerHTML = html;
 
-            if (urls.length <= 1) return;
+            if (!multi) return;
             var img = block.querySelector('img');
             function goTo(i) {
                 current = (i + urls.length) % urls.length;
