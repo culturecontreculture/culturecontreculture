@@ -1090,7 +1090,7 @@
             updateHomeLabel(homeToggle.checked);
             homeFeedback.textContent = '';
             homeFeedback.className = 'feedback';
-            var payload = JSON.stringify([{ id: 'home_enabled', type: 'text', col: 'settings', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }]);
+            var payload = JSON.stringify([{ id: 'home_enabled', type: 'text', col: 'left', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }]);
             fetch(SUPABASE_URL + '/rest/v1/content_blocks?on_conflict=id', {
                 method: 'POST',
                 headers: {
