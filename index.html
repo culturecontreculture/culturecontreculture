@@ -21,33 +21,37 @@
         }
 
         /*
-         *  Grid 3 lignes × 2 colonnes — centré dans le viewport
-         *  row 1 : slideshow 40vh  |  poster 40vh   (même hauteur)
-         *  row 2 : dates auto      |  info Paris    (hauteur naturelle)
-         *  row 3 : bouton          |  bouton
+         *  Grid — 2 colonnes
+         *  Chaque colonne est une flex-column avec les zones dynamiques intercalées
          */
 
         .page {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: 40vh auto auto;
             width: 100%;
+            align-items: start;
         }
 
         /* Séparateur vertical */
         .col-left  { border-right: 1px solid rgba(106, 47, 47, 0.22); }
         .col-right { border-left:  1px solid rgba(106, 47, 47, 0.22); margin-left: -1px; }
 
+        /* Each column is a flex column */
+        .col-left,
+        .col-right {
+            display: flex;
+            flex-direction: column;
+        }
+
         /* ============================
-           ROW 1 gauche — SLIDESHOW
+           VISUAL — SLIDESHOW & POSTER
         ============================= */
 
         .zone-slideshow {
-            grid-column: 1;
-            grid-row: 1;
             position: relative;
             overflow: hidden;
-            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+            height: 40vh;
+            
         }
 
         .slide {
@@ -82,41 +86,263 @@
             100% { opacity: 0; }
         }
 
-        /* ============================
-           ROW 1+2 droite — POSTER (span)
-        ============================= */
-
         .zone-poster {
-            grid-column: 2;
-            grid-row: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px 48px;
             overflow: hidden;
-            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+            height: 40vh;
+            
+        }
+
+        .paris-poster {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
+            filter: drop-shadow(0 0 40px rgba(140, 0, 0, 0.25));
         }
 
         /* ============================
-           ROW 2 droite — INFO PARIS
+           ZONE HIDDEN (dynamic blocks)
         ============================= */
 
-        .zone-paris-info {
-            grid-column: 2;
-            grid-row: 2;
+        .zone-hidden {
+            display: none !important;
+        }
+
+        /* ============================
+           AUDIO ZONE
+        ============================= */
+
+        .zone-audio {
+            padding: 20px 40px;
+            
+            display: flex;
+            justify-content: center;
+        }
+
+        .audio-player {
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 520px;
+            background: #0c0808;
+            border: 1px solid rgba(106, 47, 47, 0.3);
+            border-radius: 6px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(100, 0, 0, 0.1);
+        }
+
+        .audio-track-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #9a6060;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: none;
+        }
+        .audio-track-name.has-title { display: block; }
+
+        .audio-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audio-play-btn {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #8b0000;
+            border: none;
+            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 48px;
-            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 0 16px rgba(139, 0, 0, 0.4);
+        }
+
+        .audio-play-btn:hover {
+            background: #a80000;
+            transform: scale(1.08);
+        }
+
+        .audio-play-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+            margin-left: 3px; /* optical centering for play icon */
+        }
+
+        .audio-play-btn.playing svg { margin-left: 0; }
+
+        .audio-track {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .audio-progress {
+            width: 100%;
+            height: 3px;
+            background: rgba(106, 47, 47, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .audio-progress-fill {
+            height: 100%;
+            background: #8b0000;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+            pointer-events: none;
+        }
+
+        .audio-time {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            color: #6a2f2f;
+            letter-spacing: 0.1em;
+        }
+
+        /* ============================
+           MEDIA BLOCKS (text + photo stacked)
+        ============================= */
+
+        .zone-media-row {
+            display: block;
+            
+        }
+
+        .zone-media-row.row-hidden {
+            display: none;
+        }
+
+        .block-text {
+            padding: 24px 40px;
+            background: #060404;
+            text-align: center;
+            
+        }
+
+        .block-text:last-child { border-bottom: none; }
+
+        .block-text .text-content {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #9a6060;
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-align: center;
+        }
+
+        .block-photo {
+            width: 100%;
+            overflow: visible;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* image unique et galerie : même conteneur 4:3 */
+        .block-photo-wrap,
+        .gallery-stage {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            aspect-ratio: 4 / 3;
+            position: relative;
+            border-radius: 6px;
+            border: 1px solid rgba(106, 47, 47, 0.2);
+            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .block-photo-wrap > img,
+        .gallery-stage > img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .gallery-stage > img { transition: opacity 0.35s ease; }
+
+        /* ============================
+           GALLERY
+        ============================= */
+
+        .gallery { width: 100%; }
+        .gallery-arrow {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            background: rgba(139,0,0,0.75); color: #fff; border: none; cursor: pointer;
+            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; z-index: 2;
+        }
+        .gallery-arrow:hover { background: rgba(139,0,0,1); }
+        .gallery-prev { left: 10px; }
+        .gallery-next { right: 10px; }
+        .gallery-dots { display: flex; justify-content: center; gap: 8px; padding: 14px 0 4px; }
+        .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(106,47,47,0.35); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
+        .gallery-dot.active { background: #8b0000; }
+
+        /* ============================
+           AUDIO PLAYLIST
+        ============================= */
+
+        .audio-tracklist { width: 100%; max-width: 480px; margin-bottom: 12px; }
+        .audio-track-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 14px; cursor: pointer;
+            border-left: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .audio-track-item:hover { background: rgba(106,47,47,0.08); }
+        .audio-track-item.active { border-left-color: #8b0000; }
+        .audio-track-num { font-family: 'Courier New'; font-size: 10px; color: #4a2f2f; min-width: 20px; }
+        .audio-track-title { font-family: 'Courier New'; font-size: 11px; color: #9a6060; letter-spacing: 0.08em; text-transform: uppercase; }
+        .audio-track-item.active .audio-track-title { color: #c87070; }
+        .audio-nav-btn {
+            flex-shrink: 0; background: none; border: 1px solid rgba(106,47,47,0.4);
+            color: #6a2f2f; cursor: pointer; width: 28px; height: 28px;
+            border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .audio-nav-btn:hover { border-color: #8b0000; color: #c87070; }
+        .audio-controls { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 520px; }
+
+        /* ============================
+           VIDEO ZONE
+        ============================= */
+
+        .zone-video {
+            padding: 20px 40px;
+            
+            display: flex;
+            justify-content: center;
         }
 
         .video-wrap {
-            width: 78%;
+            width: 100%;
+            max-width: 520px;
             aspect-ratio: 16 / 9;
             position: relative;
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.15);
@@ -130,29 +356,18 @@
             border: none;
         }
 
-        .paris-poster {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
-            border-radius: 4px;
-            filter: drop-shadow(0 0 40px rgba(140, 0, 0, 0.25));
-        }
-
         /* ============================
-           ROW 2 gauche — DATES
+           DATES
         ============================= */
 
         .zone-dates {
-            grid-column: 1;
-            grid-row: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 24px 40px;
             overflow: hidden;
-            border-bottom: 1px solid rgba(106, 47, 47, 0.15);
+            
         }
 
         .col-label {
@@ -205,18 +420,25 @@
         }
 
         /* ============================
-           ROW 3 — BOUTONS
+           PARIS INFO (video wrapper)
         ============================= */
 
-        .zone-btn-tour {
-            grid-column: 1;
-            grid-row: 3;
+        .zone-paris-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 48px;
+            
         }
 
-        .zone-btn-paris {
-            grid-column: 2;
-            grid-row: 3;
+        .zone-paris-info .video-wrap {
+            width: 78%;
         }
+
+        /* ============================
+           BOUTONS
+        ============================= */
 
         .zone-btn-tour,
         .zone-btn-paris {
@@ -302,9 +524,20 @@
             .zone-poster,
             .zone-dates,
             .zone-btn-tour,
-            .zone-btn-paris {
+            .zone-btn-paris,
+            .zone-audio,
+            .zone-video {
                 padding-left: 24px;
                 padding-right: 24px;
+            }
+
+            .zone-paris-info {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .zone-paris-info .video-wrap {
+                width: 100%;
             }
         }
 
@@ -316,13 +549,27 @@
                 flex-direction: column;
             }
 
-            .zone-poster     { order: 1; height: 80vw; border-bottom: none; padding: 16px; }
-            .zone-paris-info { order: 2; padding: 16px 24px; border-bottom: none; }
+            /* Right column (Paris) first */
+            .col-right { order: 1; }
+            .col-left  { order: 2; }
+
+            .col-left, .col-right {
+                width: 100%;
+                min-width: 0;
+                text-align: center;
+            }
+
+            .col-left  { border-right: none; }
+            .col-right { border-left: none; margin-left: 0; }
+
+            .zone-poster     { height: 80vw; border-bottom: none; padding: 16px; }
+            .zone-paris-info { padding: 16px 24px; border-bottom: none; }
             .zone-paris-info .video-wrap { width: 100%; }
-            .zone-btn-paris  { order: 3; border-bottom: 1px solid rgba(106,47,47,0.2); }
-            .zone-slideshow  { order: 4; height: 80vw; border-bottom: none; }
-            .zone-dates      { order: 5; }
-            .zone-btn-tour   { order: 6; }
+
+            .zone-slideshow  { height: 80vw; border-bottom: none; }
+
+            .slide { padding: 16px; }
+            .slide img { object-fit: contain; }
 
             .zone-poster .paris-poster {
                 max-width: 100%;
@@ -330,13 +577,10 @@
                 object-fit: contain;
             }
 
-            .slide { padding: 16px; }
-            .slide img {
-                object-fit: contain;
-            }
+            .zone-audio { padding: 14px 16px; }
+            .zone-video { padding: 14px 16px; }
 
-            .col-left  { border-right: none; }
-            .col-right { border-left: none; margin-left: 0; }
+            .block-text { padding: 14px 16px; }
 
             .cta-button { width: 100%; text-align: center; }
         }
@@ -345,134 +589,460 @@
 <body>
     <div class="page">
 
-        <!-- ROW 1 gauche : slideshow -->
-        <div class="zone-slideshow col-left">
-            <div class="slide">
-                <img src="001.jpg" alt="Les Maudits">
-            </div>
-            <div class="slide">
-                <img src="002.jpg" alt="Les Mots Dits">
-            </div>
-        </div>
+        <!-- ==================== LEFT COLUMN ==================== -->
+        <div class="col-left">
 
-        <!-- ROW 1+2 droite : poster Paris -->
-        <div class="zone-poster col-right">
-            <img class="paris-poster" src="300127.webp" alt="Le Concert du Siècle — Adidas Arena">
-        </div>
-
-        <!-- ROW 2 gauche : dates tournée -->
-        <div class="zone-dates col-left">
-            <div class="col-label">Tournée 2026</div>
-            <div class="dates-list">
-                <div class="date-item">
-                    <span class="date-d">12/11</span>
-                    <span class="date-city">Amiens</span>
-                    <span class="date-venue">Zénith</span>
+            <!-- 1. Slideshow (unchanged) -->
+            <div class="zone-slideshow">
+                <div class="slide">
+                    <img src="001.jpg" alt="Les Maudits">
                 </div>
-                <div class="date-item">
-                    <span class="date-d">14/11</span>
-                    <span class="date-city">Reims</span>
-                    <span class="date-venue">Arena</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">18/11</span>
-                    <span class="date-city">Clermont-Ferrand</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">19/11</span>
-                    <span class="date-city">Nantes</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">24/11</span>
-                    <span class="date-city">Rennes</span>
-                    <span class="date-venue">Liberté</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">25/11</span>
-                    <span class="date-city">Caen</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">26/11</span>
-                    <span class="date-city">Brest</span>
-                    <span class="date-venue">Arena</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">28/11</span>
-                    <span class="date-city">Bordeaux</span>
-                    <span class="date-venue">Arkéa Arena</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">01/12</span>
-                    <span class="date-city">Grenoble</span>
-                    <span class="date-venue">Summum</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">03/12</span>
-                    <span class="date-city">Toulouse</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">04/12</span>
-                    <span class="date-city">Montpellier</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">05/12</span>
-                    <span class="date-city">Aix-en-Provence</span>
-                    <span class="date-venue">Arena</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">08/12</span>
-                    <span class="date-city">Dijon</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">09/12</span>
-                    <span class="date-city">Lyon</span>
-                    <span class="date-venue">LDLC Arena</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">11/12</span>
-                    <span class="date-city">Lille</span>
-                    <span class="date-venue">Zénith</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-d">12/12</span>
-                    <span class="date-city">Amnéville</span>
-                    <span class="date-venue">Galaxie</span>
+                <div class="slide">
+                    <img src="002.jpg" alt="Les Mots Dits">
                 </div>
             </div>
-        </div>
 
-        <!-- ROW 3 gauche : bouton tournée -->
-        <div class="zone-btn-tour col-left">
-            <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="cta-button">
-                Réserver
-            </a>
-        </div>
-
-        <!-- ROW 2 droite : vidéo Paris -->
-        <div class="zone-paris-info col-right">
-            <div class="video-wrap">
-                <iframe
-                    src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1"
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
+            <!-- 2. Audio (dynamic) -->
+            <div class="zone zone-audio zone-hidden" data-id="left_audio">
+                <div class="audio-player">
+                    <div class="audio-track-name"></div>
+                    <div class="audio-controls-row">
+                        <button class="audio-play-btn" aria-label="Play">
+                            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                        </button>
+                        <div class="audio-track">
+                            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+                            <span class="audio-time">0:00</span>
+                        </div>
+                    </div>
+                    <audio preload="none"><source src="" type="audio/mpeg"></audio>
+                </div>
             </div>
-        </div>
 
-        <!-- ROW 3 droite : bouton Paris -->
-        <div class="zone-btn-paris col-right">
-            <a href="https://tix.to/saez2027AR/gwjyb" class="reserve-btn">
-                <img src="reserver.webp" alt="Réserver">
-            </a>
-        </div>
+            <!-- 3. Text + Photo (dynamic, side by side) -->
+            <div class="zone-media-row row-hidden" data-media="left">
+                <div class="block-text zone-hidden" data-id="left_text">
+                    <p class="text-content"></p>
+                </div>
+                <div class="block-photo zone-hidden" data-id="left_photo">
+                    <img src="" alt="">
+                </div>
+            </div>
 
-    </div>
+            <!-- 4. YouTube (dynamic) -->
+            <div class="zone zone-video zone-hidden" data-id="left_youtube">
+                <div class="video-wrap">
+                    <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- 5. Dates tournée (unchanged) -->
+            <div class="zone-dates">
+                <div class="col-label">Tournée 2026</div>
+                <div class="dates-list">
+                    <div class="date-item">
+                        <span class="date-d">12/11</span>
+                        <span class="date-city">Amiens</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">14/11</span>
+                        <span class="date-city">Reims</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">18/11</span>
+                        <span class="date-city">Clermont-Ferrand</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">19/11</span>
+                        <span class="date-city">Nantes</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">24/11</span>
+                        <span class="date-city">Rennes</span>
+                        <span class="date-venue">Liberté</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">25/11</span>
+                        <span class="date-city">Caen</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">26/11</span>
+                        <span class="date-city">Brest</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">28/11</span>
+                        <span class="date-city">Bordeaux</span>
+                        <span class="date-venue">Arkéa Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">01/12</span>
+                        <span class="date-city">Grenoble</span>
+                        <span class="date-venue">Summum</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">03/12</span>
+                        <span class="date-city">Toulouse</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">04/12</span>
+                        <span class="date-city">Montpellier</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">05/12</span>
+                        <span class="date-city">Aix-en-Provence</span>
+                        <span class="date-venue">Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">08/12</span>
+                        <span class="date-city">Dijon</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">09/12</span>
+                        <span class="date-city">Lyon</span>
+                        <span class="date-venue">LDLC Arena</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">11/12</span>
+                        <span class="date-city">Lille</span>
+                        <span class="date-venue">Zénith</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-d">12/12</span>
+                        <span class="date-city">Amnéville</span>
+                        <span class="date-venue">Galaxie</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Bouton réserver (unchanged) -->
+            <div class="zone-btn-tour">
+                <a href="https://billetterie.seetickets.fr/ext/billetterie5/?site=latourneedesmaudits" class="cta-button">
+                    Réserver
+                </a>
+            </div>
+
+        </div><!-- /col-left -->
+
+        <!-- ==================== RIGHT COLUMN ==================== -->
+        <div class="col-right">
+
+            <!-- 1. Poster Paris (unchanged) -->
+            <div class="zone-poster">
+                <img class="paris-poster" src="300127.webp" alt="Le Concert du Siècle — Adidas Arena">
+            </div>
+
+            <!-- 2. Audio (dynamic) -->
+            <div class="zone zone-audio zone-hidden" data-id="right_audio">
+                <div class="audio-player">
+                    <div class="audio-track-name"></div>
+                    <div class="audio-controls-row">
+                        <button class="audio-play-btn" aria-label="Play">
+                            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                        </button>
+                        <div class="audio-track">
+                            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+                            <span class="audio-time">0:00</span>
+                        </div>
+                    </div>
+                    <audio preload="none"><source src="" type="audio/mpeg"></audio>
+                </div>
+            </div>
+
+            <!-- 3. Text + Photo (dynamic, side by side) -->
+            <div class="zone-media-row row-hidden" data-media="right">
+                <div class="block-text zone-hidden" data-id="right_text">
+                    <p class="text-content"></p>
+                </div>
+                <div class="block-photo zone-hidden" data-id="right_photo">
+                    <img src="" alt="">
+                </div>
+            </div>
+
+            <!-- 4. YouTube (dynamic) -->
+            <div class="zone zone-video zone-hidden" data-id="right_youtube">
+                <div class="video-wrap"></div>
+            </div>
+
+
+            <!-- 6. Bouton réserver (unchanged) -->
+            <div class="zone-btn-paris">
+                <a href="https://tix.to/saez2027AR/gwjyb" class="reserve-btn">
+                    <img src="reserver.webp" alt="Réserver">
+                </a>
+            </div>
+
+        </div><!-- /col-right -->
+
+    </div><!-- /page -->
+
+    <script>
+    (function () {
+        'use strict';
+
+        var SUPABASE_URL = 'https://cciypmugbemibaeuppco.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaXlwbXVnYmVtaWJhZXVwcGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY1NzE3NjEsImV4cCI6MjA0MjE0Nzc2MX0.Jz6v2Akm17_xtPw14w6RaaPV4oQ-dEGpqJhJxEd2BCo';
+        var YT_PARAMS   = 'autoplay=1&mute=1&rel=0&iv_load_policy=3';
+
+        function buildYouTubeSrc(videoId) {
+            return 'https://www.youtube.com/embed/' + videoId + '?' + YT_PARAMS;
+        }
+
+        function applyBlock(block) {
+            if (!block.content) return;
+
+            var id = block.id;
+            var type = block.type;
+            var content = block.content;
+
+            if (type === 'youtube') {
+                var videoZone = document.querySelector('.zone[data-id="' + id + '"]');
+                if (videoZone) {
+                    var wrap = videoZone.querySelector('.video-wrap');
+                    if (wrap) {
+                        var iframe = document.createElement('iframe');
+                        iframe.src = buildYouTubeSrc(content);
+                        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                        iframe.setAttribute('allowfullscreen', '');
+                        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+                        wrap.innerHTML = '';
+                        wrap.appendChild(iframe);
+                    }
+                    videoZone.classList.remove('zone-hidden');
+                }
+                return;
+            }
+
+            if (type === 'audio') {
+                var audioZone = document.querySelector('.zone[data-id="' + id + '"]');
+                if (!audioZone) return;
+                var items = null;
+                try { var p = JSON.parse(content); if (Array.isArray(p) && p.length) items = p; } catch(e){}
+                if (items && items.length > 1) {
+                    renderPlaylist(audioZone, items);
+                } else {
+                    var track = items ? items[0] : { url: content, title: '' };
+                    var url   = track.url || content;
+                    var title = track.title || '';
+                    var source = audioZone.querySelector('audio source');
+                    var aud    = audioZone.querySelector('audio');
+                    if (source) source.src = url;
+                    if (aud)    { aud.load(); initAudioPlayer(audioZone); }
+                    // Afficher le titre si présent
+                    var nameEl = audioZone.querySelector('.audio-track-name');
+                    if (nameEl && title) { nameEl.textContent = title; nameEl.classList.add('has-title'); }
+                }
+                audioZone.classList.remove('zone-hidden');
+                return;
+            }
+
+            if (type === 'text') {
+                var textBlock = document.querySelector('.block-text[data-id="' + id + '"]');
+                if (textBlock) {
+                    var p = textBlock.querySelector('.text-content');
+                    if (p) p.textContent = content;
+                    textBlock.classList.remove('zone-hidden');
+                    // Show parent media row
+                    var col = id.startsWith('left') ? 'left' : 'right';
+                    var row = document.querySelector('.zone-media-row[data-media="' + col + '"]');
+                    if (row) row.classList.remove('row-hidden');
+                }
+                return;
+            }
+
+            if (type === 'photo') {
+                var photoBlock = document.querySelector('.block-photo[data-id="' + id + '"]');
+                if (!photoBlock) return;
+                var items = null;
+                try { var p = JSON.parse(content); if (Array.isArray(p) && p.length) items = p; } catch(e){}
+                if (items && items.length > 1) {
+                    renderGallery(photoBlock, items);
+                } else {
+                    var url = items ? items[0] : content;
+                    photoBlock.innerHTML = '<div class="block-photo-wrap"><img src="' + url + '" alt=""></div>';
+                }
+                photoBlock.classList.remove('zone-hidden');
+                var row = photoBlock.closest('.zone-media-row');
+                if (row) row.classList.remove('row-hidden');
+                return;
+            }
+        }
+
+        function loadBlocks() {
+            var url = SUPABASE_URL + '/rest/v1/content_blocks?visible=eq.true&id=neq.home_enabled&select=id,type,col,content';
+            fetch(url, {
+                headers: {
+                    'apikey':        SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY
+                }
+            })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (blocks) {
+                blocks.forEach(function (block) {
+                    applyBlock(block);
+                });
+            })
+            .catch(function (err) {
+                // Silent fail — site still works without dynamic content
+                console.warn('[CCC] Content load failed:', err.message);
+            });
+        }
+
+        function loadContent() {
+            var url = SUPABASE_URL + '/rest/v1/content_blocks?id=eq.home_enabled&select=visible';
+            fetch(url, {
+                headers: {
+                    'apikey':        SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY
+                }
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (rows) {
+                if (rows && rows.length > 0 && rows[0].visible === true) {
+                    loadBlocks();
+                }
+                // else: mode statique — aucun bloc dynamique chargé
+            })
+            .catch(function () {
+                // Silent fail — affiche le contenu statique
+            });
+        }
+
+        function fmt(s) {
+            var m = Math.floor(s / 60);
+            var sec = Math.floor(s % 60);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function renderPlaylist(zone, tracks) {
+            var audio   = zone.querySelector('audio');
+            var player  = zone.querySelector('.audio-player');
+            var ctrlRow = zone.querySelector('.audio-controls-row');
+            var current = 0;
+
+            // Tracklist (injectée avant .audio-controls-row dans .audio-player)
+            var listHtml = '<div class="audio-tracklist">';
+            tracks.forEach(function(t, i) {
+                var title = (typeof t === 'object' && t.title) ? t.title : ('Piste ' + (i+1));
+                listHtml += '<div class="audio-track-item' + (i===0?' active':'') + '" data-ti="'+i+'">' +
+                    '<span class="audio-track-num">0'+(i+1)+'</span>' +
+                    '<span class="audio-track-title">'+title+'</span></div>';
+            });
+            listHtml += '</div>';
+            player.insertAdjacentHTML('afterbegin', listHtml);
+
+            // Prev/Next dans .audio-controls-row, autour du play-btn
+            var playBtn = ctrlRow.querySelector('.audio-play-btn');
+            var prevB = document.createElement('button');
+            prevB.className = 'audio-nav-btn'; prevB.innerHTML = '&#8592;'; prevB.type = 'button';
+            var nextB = document.createElement('button');
+            nextB.className = 'audio-nav-btn'; nextB.innerHTML = '&#8594;'; nextB.type = 'button';
+            ctrlRow.insertBefore(prevB, playBtn);
+            ctrlRow.insertBefore(nextB, playBtn.nextSibling);
+
+            function loadTrack(i) {
+                var wasPlaying = !audio.paused;
+                current = (i + tracks.length) % tracks.length;
+                var url = (typeof tracks[current]==='object') ? tracks[current].url : tracks[current];
+                audio.src = url; audio.load();
+                zone.querySelectorAll('.audio-track-item').forEach(function(el,idx){ el.classList.toggle('active', idx===current); });
+                if (wasPlaying) audio.play();
+            }
+
+            loadTrack(0);
+            initAudioPlayer(zone);
+
+            prevB.addEventListener('click', function(){ loadTrack(current-1); });
+            nextB.addEventListener('click', function(){ loadTrack(current+1); });
+            zone.querySelectorAll('.audio-track-item').forEach(function(el){
+                el.addEventListener('click', function(){ loadTrack(parseInt(el.getAttribute('data-ti'))); });
+            });
+        }
+
+        function renderGallery(block, urls) {
+            var current = 0;
+            var multi = urls.length > 1;
+            var html = '<div class="gallery"><div class="gallery-stage"><img src="'+urls[0]+'" alt="">';
+            if (multi) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button><button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
+            html += '</div>';
+            if (multi) {
+                html += '<div class="gallery-dots">';
+                urls.forEach(function(_,i){ html += '<button class="gallery-dot'+(i===0?' active':'')+'" data-di="'+i+'" type="button"></button>'; });
+                html += '</div>';
+            }
+            html += '</div>';
+            block.innerHTML = html;
+
+            if (!multi) return;
+            var img = block.querySelector('img');
+            function goTo(i) {
+                current = (i + urls.length) % urls.length;
+                img.style.opacity = '0';
+                setTimeout(function() {
+                    img.src = urls[current];
+                    img.style.opacity = '1';
+                    block.querySelectorAll('.gallery-dot').forEach(function(d,idx){ d.classList.toggle('active', idx===current); });
+                }, 300);
+            }
+            block.querySelector('.gallery-prev').addEventListener('click', function(){ goTo(current-1); });
+            block.querySelector('.gallery-next').addEventListener('click', function(){ goTo(current+1); });
+            block.querySelectorAll('.gallery-dot').forEach(function(d){
+                d.addEventListener('click', function(){ goTo(parseInt(d.getAttribute('data-di'))); });
+            });
+        }
+
+        function initAudioPlayer(zone) {
+            var audio   = zone.querySelector('audio');
+            var btn     = zone.querySelector('.audio-play-btn');
+            var fill    = zone.querySelector('.audio-progress-fill');
+            var bar     = zone.querySelector('.audio-progress');
+            var timeEl  = zone.querySelector('.audio-time');
+            var playIcon = '<polygon points="5,3 19,12 5,21"/>';
+            var pauseIcon = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
+
+            btn.addEventListener('click', function () {
+                if (audio.paused) { audio.play(); } else { audio.pause(); }
+            });
+            audio.addEventListener('play', function () {
+                btn.classList.add('playing');
+                btn.querySelector('svg').innerHTML = pauseIcon;
+            });
+            audio.addEventListener('pause', function () {
+                btn.classList.remove('playing');
+                btn.querySelector('svg').innerHTML = playIcon;
+            });
+            audio.addEventListener('timeupdate', function () {
+                if (!audio.duration) return;
+                fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+                timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+            });
+            audio.addEventListener('ended', function () {
+                fill.style.width = '0%';
+                timeEl.textContent = '0:00';
+            });
+            bar.addEventListener('click', function (e) {
+                var rect = bar.getBoundingClientRect();
+                audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadContent);
+        } else {
+            loadContent();
+        }
+    })();
+    </script>
 </body>
 </html>

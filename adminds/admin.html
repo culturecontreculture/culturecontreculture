@@ -677,6 +677,21 @@
             </div>
         </header>
 
+        <!-- HOME ENABLED BANNER -->
+        <div id="home-banner" style="display:flex; align-items:center; gap:16px; padding:14px 32px; background:var(--bg3); border-bottom:1px solid var(--border2);">
+            <span style="font-size:9px; letter-spacing:0.4em; text-transform:uppercase; color:var(--red); white-space:nowrap;">Home</span>
+            <span style="font-size:11px; letter-spacing:0.1em; color:var(--text-dim); flex:1;">Activer le contenu dynamique sur la home</span>
+            <div class="toggle-wrap">
+                <span class="toggle-label" id="home-toggle-label">off</span>
+                <label class="toggle">
+                    <input type="checkbox" id="home-toggle">
+                    <span class="toggle-track"></span>
+                    <span class="toggle-thumb"></span>
+                </label>
+            </div>
+            <span class="feedback" id="home-feedback" style="min-width:80px; text-align:right;"></span>
+        </div>
+
         <div class="admin-body">
 
             <!-- LEFT: Tournée -->
@@ -1047,7 +1062,53 @@
         /* ────────────────────────────────────────────────
            LOAD ALL BLOCKS
         ──────────────────────────────────────────────── */
+        /* ────────────────────────────────────────────────
+           HOME ENABLED TOGGLE
+        ──────────────────────────────────────────────── */
+        var homeToggle  = document.getElementById('home-toggle');
+        var homeLabel   = document.getElementById('home-toggle-label');
+        var homeFeedback = document.getElementById('home-feedback');
+
+        function updateHomeLabel(checked) {
+            homeLabel.textContent = checked ? 'on' : 'off';
+            if (checked) homeLabel.classList.add('on');
+            else         homeLabel.classList.remove('on');
+        }
+
+        function loadHomeEnabled() {
+            sb.from('content_blocks')
+              .select('visible')
+              .eq('id', 'home_enabled')
+              .then(function (res) {
+                  if (res.error || !res.data || !res.data.length) return;
+                  homeToggle.checked = !!res.data[0].visible;
+                  updateHomeLabel(homeToggle.checked);
+              });
+        }
+
+        homeToggle.addEventListener('change', function () {
+            updateHomeLabel(homeToggle.checked);
+            homeFeedback.textContent = '';
+            homeFeedback.className = 'feedback';
+            sb.from('content_blocks')
+              .upsert({ id: 'home_enabled', type: 'flag', col: 'settings', content: '', visible: homeToggle.checked }, { onConflict: 'id' })
+              .then(function (res) {
+                  if (res.error) {
+                      homeFeedback.textContent = 'Erreur';
+                      homeFeedback.className = 'feedback error';
+                  } else {
+                      homeFeedback.textContent = homeToggle.checked ? 'Home activée ✓' : 'Home désactivée ✓';
+                      homeFeedback.className = 'feedback success';
+                      setTimeout(function () {
+                          homeFeedback.textContent = '';
+                          homeFeedback.className = 'feedback';
+                      }, 2500);
+                  }
+              });
+        });
+
         function loadAllBlocks() {
+            loadHomeEnabled();
             sb.from('content_blocks')
               .select('*')
               .then(function (res) {
