@@ -582,6 +582,31 @@
             opacity: 1;
         }
 
+        /* Multi-items: tracks and photos */
+        .tracks-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .track-row {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 3px; padding: 8px 10px;
+        }
+        .track-row-title { flex: 1; font-size: 11px; color: var(--text); letter-spacing: 0.05em; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-row-num { font-size: 10px; color: var(--text-muted); min-width: 20px; }
+        .btn-remove { background: none; border: 1px solid var(--border); color: var(--red-light); cursor: pointer; padding: 2px 8px; border-radius: 2px; font-size: 11px; transition: all 0.15s; }
+        .btn-remove:hover { background: var(--error); border-color: var(--error-t); }
+        .btn-secondary {
+            background: none; border: 1px solid var(--border2);
+            color: var(--text-dim); cursor: pointer; padding: 8px 16px;
+            font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+            text-transform: uppercase; transition: all 0.2s; border-radius: 2px; width: 100%;
+        }
+        .btn-secondary:hover { border-color: var(--red); color: var(--text); }
+        .add-track-form { border: 1px solid var(--border); border-radius: 3px; padding: 12px; background: var(--bg2); margin-bottom: 12px; }
+        .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .photo-thumb { position: relative; aspect-ratio: 1/1; }
+        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
+        .photo-thumb .btn-remove { position: absolute; top: 4px; right: 4px; padding: 2px 6px; background: rgba(10,0,0,0.8); }
+        .progress-bar-inner { height: 100%; background: var(--red); width: 0%; transition: width 0.3s; }
+
         /* Responsive */
         @media (max-width: 700px) {
             .admin-body {
@@ -656,19 +681,21 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="preview" data-preview>
-                            <span class="preview-none">Aucun fichier</span>
+                        <div class="tracks-list" data-tracks-list>
+                            <span class="preview-none">Aucun morceau</span>
                         </div>
-                        <div>
+                        <div class="add-track-form">
+                            <input type="text" class="input-field" placeholder="Titre du morceau" data-track-title style="margin-bottom:8px;">
                             <div class="field-label">Fichier audio (MP3, WAV, OGG)</div>
                             <div class="file-upload-area">
                                 <input type="file" accept="audio/*" data-file>
                                 <div class="file-upload-hint">Cliquer pour choisir un fichier</div>
                                 <div class="file-upload-name" data-filename></div>
                             </div>
-                        </div>
-                        <div class="progress-wrap" data-progress-wrap>
-                            <div class="progress-bar" data-progress-bar></div>
+                            <div class="progress-wrap" data-progress-wrap>
+                                <div class="progress-bar-inner" data-progress-bar></div>
+                            </div>
+                            <button class="btn-secondary" data-add-track style="margin-top:10px;">+ Ajouter ce morceau</button>
                         </div>
                         <div class="save-row">
                             <button class="btn-save" data-save>Enregistrer</button>
@@ -719,19 +746,17 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="preview" data-preview>
+                        <div class="photos-grid" data-photos-grid>
                             <span class="preview-none">Aucune photo</span>
                         </div>
-                        <div>
-                            <div class="field-label">Image (JPG, PNG, WEBP)</div>
-                            <div class="file-upload-area">
-                                <input type="file" accept="image/*" data-file>
-                                <div class="file-upload-hint">Cliquer pour choisir une image</div>
-                                <div class="file-upload-name" data-filename></div>
-                            </div>
+                        <div class="field-label" style="margin-top:12px;">Ajouter des photos (JPG, PNG, WEBP)</div>
+                        <div class="file-upload-area">
+                            <input type="file" accept="image/*" data-file multiple>
+                            <div class="file-upload-hint">Cliquer pour choisir (plusieurs possibles)</div>
+                            <div class="file-upload-name" data-filename></div>
                         </div>
                         <div class="progress-wrap" data-progress-wrap>
-                            <div class="progress-bar" data-progress-bar></div>
+                            <div class="progress-bar-inner" data-progress-bar></div>
                         </div>
                         <div class="save-row">
                             <button class="btn-save" data-save>Enregistrer</button>
@@ -788,19 +813,21 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="preview" data-preview>
-                            <span class="preview-none">Aucun fichier</span>
+                        <div class="tracks-list" data-tracks-list>
+                            <span class="preview-none">Aucun morceau</span>
                         </div>
-                        <div>
+                        <div class="add-track-form">
+                            <input type="text" class="input-field" placeholder="Titre du morceau" data-track-title style="margin-bottom:8px;">
                             <div class="field-label">Fichier audio (MP3, WAV, OGG)</div>
                             <div class="file-upload-area">
                                 <input type="file" accept="audio/*" data-file>
                                 <div class="file-upload-hint">Cliquer pour choisir un fichier</div>
                                 <div class="file-upload-name" data-filename></div>
                             </div>
-                        </div>
-                        <div class="progress-wrap" data-progress-wrap>
-                            <div class="progress-bar" data-progress-bar></div>
+                            <div class="progress-wrap" data-progress-wrap>
+                                <div class="progress-bar-inner" data-progress-bar></div>
+                            </div>
+                            <button class="btn-secondary" data-add-track style="margin-top:10px;">+ Ajouter ce morceau</button>
                         </div>
                         <div class="save-row">
                             <button class="btn-save" data-save>Enregistrer</button>
@@ -851,19 +878,17 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="preview" data-preview>
+                        <div class="photos-grid" data-photos-grid>
                             <span class="preview-none">Aucune photo</span>
                         </div>
-                        <div>
-                            <div class="field-label">Image (JPG, PNG, WEBP)</div>
-                            <div class="file-upload-area">
-                                <input type="file" accept="image/*" data-file>
-                                <div class="file-upload-hint">Cliquer pour choisir une image</div>
-                                <div class="file-upload-name" data-filename></div>
-                            </div>
+                        <div class="field-label" style="margin-top:12px;">Ajouter des photos (JPG, PNG, WEBP)</div>
+                        <div class="file-upload-area">
+                            <input type="file" accept="image/*" data-file multiple>
+                            <div class="file-upload-hint">Cliquer pour choisir (plusieurs possibles)</div>
+                            <div class="file-upload-name" data-filename></div>
                         </div>
                         <div class="progress-wrap" data-progress-wrap>
-                            <div class="progress-bar" data-progress-bar></div>
+                            <div class="progress-bar-inner" data-progress-bar></div>
                         </div>
                         <div class="save-row">
                             <button class="btn-save" data-save>Enregistrer</button>
@@ -922,6 +947,14 @@
            SUPABASE CLIENT
         ──────────────────────────────────────────────── */
         var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // État local des blocs multi-items
+        var mediaState = {
+            left_audio:  [],   // [{url, title}, ...]
+            right_audio: [],
+            left_photo:  [],   // [url, ...]
+            right_photo: []
+        };
 
         /* ────────────────────────────────────────────────
            PASSWORD SCREEN
@@ -1036,6 +1069,24 @@
                 var ytInput = card.querySelector('[data-yt]');
                 if (ytInput && block.content) ytInput.value = block.content;
             }
+
+            // Gérer les multi-items pour audio et photo
+            if (block.type === 'audio') {
+                var tracks = [];
+                try { var p = JSON.parse(block.content); if(Array.isArray(p)) tracks = p; } catch(e) {
+                    if (block.content) tracks = [{ url: block.content, title: 'Piste 1' }];
+                }
+                mediaState[block.id] = tracks;
+                renderTracksList(card, block.id);
+            }
+            if (block.type === 'photo') {
+                var photos = [];
+                try { var p = JSON.parse(block.content); if(Array.isArray(p)) photos = p; } catch(e) {
+                    if (block.content) photos = [block.content];
+                }
+                mediaState[block.id] = photos;
+                renderPhotosGrid(card, block.id);
+            }
         }
 
         function updateToggleLabel(el, checked) {
@@ -1140,11 +1191,154 @@
                 });
             }
 
+            // Bouton "ajouter morceau" pour les cartes audio
+            var addTrackBtn = card.querySelector('[data-add-track]');
+            if (addTrackBtn) {
+                addTrackBtn.addEventListener('click', function() {
+                    handleAddTrack(card, id, feedbackEl);
+                });
+            }
+
+            // Auto-upload photos quand fichiers choisis
+            var fileInp = card.querySelector('[data-file]');
+            if (fileInp && fileInp.multiple) {
+                fileInp.addEventListener('change', function() {
+                    if (fileInp.files.length) handleAddPhotos(card, id, feedbackEl);
+                });
+            }
+
             // Save button
             saveBtn.addEventListener('click', function () {
                 handleSave(card, id, saveBtn, feedbackEl);
             });
         });
+
+        /* ────────────────────────────────────────────────
+           MULTI-ITEMS: TRACKS & PHOTOS
+        ──────────────────────────────────────────────── */
+
+        // Rend la liste des morceaux dans la card
+        function renderTracksList(card, id) {
+            var list = card.querySelector('[data-tracks-list]');
+            if (!list) return;
+            var tracks = mediaState[id] || [];
+            if (!tracks.length) { list.innerHTML = '<span class="preview-none">Aucun morceau</span>'; return; }
+            list.innerHTML = '';
+            tracks.forEach(function(t, i) {
+                var row = document.createElement('div'); row.className = 'track-row';
+                row.innerHTML = '<span class="track-row-num">0'+(i+1)+'</span>' +
+                    '<span class="track-row-title">'+(t.title || 'Sans titre')+'</span>' +
+                    '<button class="btn-remove" data-rem="'+i+'">×</button>';
+                row.querySelector('[data-rem]').addEventListener('click', function() {
+                    mediaState[id].splice(i, 1);
+                    renderTracksList(card, id);
+                });
+                list.appendChild(row);
+            });
+        }
+
+        // Rend la grille de photos dans la card
+        function renderPhotosGrid(card, id) {
+            var grid = card.querySelector('[data-photos-grid]');
+            if (!grid) return;
+            var photos = mediaState[id] || [];
+            if (!photos.length) { grid.innerHTML = '<span class="preview-none">Aucune photo</span>'; return; }
+            grid.innerHTML = '';
+            photos.forEach(function(url, i) {
+                var thumb = document.createElement('div'); thumb.className = 'photo-thumb';
+                thumb.innerHTML = '<img src="'+url+'" alt=""><button class="btn-remove" data-rem="'+i+'">×</button>';
+                thumb.querySelector('[data-rem]').addEventListener('click', function() {
+                    mediaState[id].splice(i, 1);
+                    renderPhotosGrid(card, id);
+                });
+                grid.appendChild(thumb);
+            });
+        }
+
+        // Upload un seul fichier et renvoie l'URL publique
+        function uploadSingleFile(bucket, path, file, onProgress) {
+            return sb.storage.from(bucket).upload(path, file, { upsert: true, cacheControl: '3600' })
+                .then(function(res) {
+                    if (res.error) throw res.error;
+                    if (onProgress) onProgress(80);
+                    return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+                });
+        }
+
+        // Gère "Ajouter ce morceau" sur une card audio
+        function handleAddTrack(card, id, feedbackEl) {
+            var titleInput = card.querySelector('[data-track-title]');
+            var fileInput  = card.querySelector('[data-file]');
+            var progressWrap = card.querySelector('[data-progress-wrap]');
+            var progressBar  = card.querySelector('[data-progress-bar]');
+            var addBtn = card.querySelector('[data-add-track]');
+
+            if (!fileInput || !fileInput.files[0]) {
+                showFeedback(feedbackEl, false, 'Choisir un fichier audio');
+                return;
+            }
+            var title = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() : 'Piste ' + ((mediaState[id]||[]).length + 1);
+            var file = fileInput.files[0];
+            var ext = file.name.split('.').pop();
+            var path = id + '_' + Date.now() + '.' + ext;
+
+            addBtn.disabled = true;
+            if (progressWrap) progressWrap.classList.add('visible');
+            if (progressBar) progressBar.style.width = '20%';
+
+            uploadSingleFile('audio', path, file, function(p){ if(progressBar) progressBar.style.width = p+'%'; })
+                .then(function(url) {
+                    if (!mediaState[id]) mediaState[id] = [];
+                    mediaState[id].push({ url: url, title: title });
+                    renderTracksList(card, id);
+                    if (titleInput) titleInput.value = '';
+                    fileInput.value = '';
+                    var fn = card.querySelector('[data-filename]'); if(fn) fn.textContent = '';
+                    if (progressBar) progressBar.style.width = '100%';
+                    showFeedback(feedbackEl, true, 'Morceau ajouté — pensez à Enregistrer');
+                })
+                .catch(function(err) { showFeedback(feedbackEl, false, err.message || 'Erreur upload'); })
+                .finally(function() {
+                    addBtn.disabled = false;
+                    setTimeout(function(){ if(progressWrap) progressWrap.classList.remove('visible'); if(progressBar) progressBar.style.width='0%'; }, 1000);
+                });
+        }
+
+        // Gère l'ajout de photos (multiple)
+        function handleAddPhotos(card, id, feedbackEl) {
+            var fileInput = card.querySelector('[data-file]');
+            var progressWrap = card.querySelector('[data-progress-wrap]');
+            var progressBar  = card.querySelector('[data-progress-bar]');
+            var saveBtn = card.querySelector('[data-save]');
+            if (!fileInput || !fileInput.files.length) { showFeedback(feedbackEl, false, 'Choisir au moins une photo'); return; }
+
+            var files = Array.from(fileInput.files);
+            var total = files.length; var done = 0;
+            saveBtn.disabled = true;
+            if (progressWrap) progressWrap.classList.add('visible');
+
+            Promise.all(files.map(function(file) {
+                var ext = file.name.split('.').pop();
+                var path = id + '_' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + ext;
+                return uploadSingleFile('photos', path, file, null).then(function(url) {
+                    done++;
+                    if (progressBar) progressBar.style.width = (done/total*90)+'%';
+                    return url;
+                });
+            })).then(function(urls) {
+                if (!mediaState[id]) mediaState[id] = [];
+                mediaState[id] = mediaState[id].concat(urls);
+                renderPhotosGrid(card, id);
+                fileInput.value = '';
+                var fn = card.querySelector('[data-filename]'); if(fn) fn.textContent = '';
+                showFeedback(feedbackEl, true, 'Photos ajoutées — pensez à Enregistrer');
+            }).catch(function(err) {
+                showFeedback(feedbackEl, false, err.message || 'Erreur upload');
+            }).finally(function() {
+                saveBtn.disabled = false;
+                setTimeout(function(){ if(progressWrap) progressWrap.classList.remove('visible'); if(progressBar) progressBar.style.width='0%'; }, 1000);
+            });
+        }
 
         /* ────────────────────────────────────────────────
            HANDLE SAVE
@@ -1168,13 +1362,17 @@
                 updateBlock(id, videoId, btn, feedbackEl, card, { id: id, type: 'youtube', content: videoId });
             }
 
-            else if (type === 'audio' || type === 'photo') {
-                var fileInput = card.querySelector('[data-file]');
-                if (!fileInput || !fileInput.files[0]) {
-                    showFeedback(feedbackEl, false, 'Aucun fichier sélectionné');
-                    return;
-                }
-                uploadFile(card, id, type, fileInput.files[0], btn, feedbackEl);
+            else if (type === 'audio') {
+                var tracks = mediaState[id] || [];
+                if (!tracks.length) { showFeedback(feedbackEl, false, 'Aucun morceau à enregistrer'); return; }
+                var content = tracks.length === 1 ? tracks[0].url : JSON.stringify(tracks);
+                updateBlock(id, content, btn, feedbackEl, card, { id:id, type:'audio', content:content });
+            }
+            else if (type === 'photo') {
+                var photos = mediaState[id] || [];
+                if (!photos.length) { showFeedback(feedbackEl, false, 'Aucune photo à enregistrer'); return; }
+                var content = photos.length === 1 ? photos[0] : JSON.stringify(photos);
+                updateBlock(id, content, btn, feedbackEl, card, { id:id, type:'photo', content:content });
             }
         }
 
