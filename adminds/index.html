@@ -255,61 +255,46 @@
             justify-content: center;
         }
 
-        .block-photo-wrap {
-            height: 340px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* image unique et galerie : même conteneur 4:3 */
+        .block-photo-wrap,
+        .gallery-stage {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            position: relative;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
-            max-width: 520px;
-            margin: 0 auto;
-            width: 100%;
+            overflow: hidden;
         }
 
-        .block-photo-wrap > img {
+        .block-photo-wrap > img,
+        .gallery-stage > img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
             height: 100%;
-            width: auto;
+            object-fit: contain;
             display: block;
         }
+
+        .gallery-stage > img { transition: opacity 0.35s ease; }
 
         /* ============================
            GALLERY
         ============================= */
 
-        .gallery { width: 100%; max-width: 520px; margin: 0 auto; }
-        .gallery-nav {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .gallery-stage {
-            flex: 1;
-            height: 340px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
-            border: 1px solid rgba(106, 47, 47, 0.2);
-            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
-        }
-        .gallery-stage > img {
-            height: 100%;
-            width: auto;
-            display: block;
-            transition: opacity 0.35s ease;
-        }
+        .gallery { width: 100%; }
         .gallery-arrow {
-            flex-shrink: 0;
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
             background: rgba(139,0,0,0.75); color: #fff; border: none; cursor: pointer;
             width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
+            transition: background 0.2s; z-index: 2;
         }
         .gallery-arrow:hover { background: rgba(139,0,0,1); }
+        .gallery-prev { left: 10px; }
+        .gallery-next { right: 10px; }
         .gallery-dots { display: flex; justify-content: center; gap: 8px; padding: 14px 0 4px; }
         .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(106,47,47,0.35); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
         .gallery-dot.active { background: #8b0000; }
@@ -966,10 +951,8 @@
         function renderGallery(block, urls) {
             var current = 0;
             var multi = urls.length > 1;
-            var html = '<div class="gallery"><div class="gallery-nav">';
-            if (multi) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button>';
-            html += '<div class="gallery-stage"><img src="'+urls[0]+'" alt=""></div>';
-            if (multi) html += '<button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
+            var html = '<div class="gallery"><div class="gallery-stage"><img src="'+urls[0]+'" alt="">';
+            if (multi) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button><button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
             html += '</div>';
             if (multi) {
                 html += '<div class="gallery-dots">';
