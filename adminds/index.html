@@ -714,14 +714,9 @@
                 </div>
             </div>
 
-            <!-- 4. YouTube — statique par défaut, src remplacé si admin change la vidéo -->
-            <div class="zone zone-video" data-id="right_youtube">
-                <div class="video-wrap">
-                    <iframe id="right-video-iframe"
-                        src="https://www.youtube.com/embed/hu-ZxnbivT0?si=uxgLV2Sbg--Sk3MR&autoplay=1&mute=1&rel=0&iv_load_policy=3"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen></iframe>
-                </div>
+            <!-- 4. YouTube (dynamic) -->
+            <div class="zone zone-video zone-hidden" data-id="right_youtube">
+                <div class="video-wrap"></div>
             </div>
 
 
@@ -758,8 +753,16 @@
             if (type === 'youtube') {
                 var videoZone = document.querySelector('.zone[data-id="' + id + '"]');
                 if (videoZone) {
-                    var iframe = videoZone.querySelector('iframe');
-                    if (iframe) iframe.src = buildYouTubeSrc(content);
+                    var wrap = videoZone.querySelector('.video-wrap');
+                    if (wrap) {
+                        var iframe = document.createElement('iframe');
+                        iframe.src = buildYouTubeSrc(content);
+                        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                        iframe.setAttribute('allowfullscreen', '');
+                        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+                        wrap.innerHTML = '';
+                        wrap.appendChild(iframe);
+                    }
                     videoZone.classList.remove('zone-hidden');
                 }
                 return;
