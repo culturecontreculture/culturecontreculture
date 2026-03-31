@@ -1359,19 +1359,32 @@
         /* ────────────────────────────────────────────────
            HANDLE SAVE
         ──────────────────────────────────────────────── */
+        function clearBlock(id, card, btn, feedbackEl) {
+            sb.from('content_blocks').update({ content: '', visible: false }).eq('id', id).then(function(res) {
+                if (res.error) { showFeedback(feedbackEl, false, res.error.message); return; }
+                var toggleInput = card.querySelector('[data-toggle]');
+                var toggleLabel = card.querySelector('[data-toggle-label]');
+                if (toggleInput) { toggleInput.checked = false; updateToggleLabel(toggleLabel, false); }
+                var preview = card.querySelector('[data-preview]');
+                if (preview) preview.innerHTML = '<span class="preview-none">Vide</span>';
+                showFeedback(feedbackEl, true, 'Bloc vidé et masqué');
+            });
+        }
+
         function handleSave(card, id, btn, feedbackEl) {
             var type = id.split('_')[1]; // audio | text | photo | youtube
 
             if (type === 'text') {
                 var textarea = card.querySelector('[data-text]');
                 var val = textarea ? textarea.value.trim() : '';
-                if (!val) { showFeedback(feedbackEl, false, 'Texte vide'); return; }
+                if (!val) { clearBlock(id, card, btn, feedbackEl); return; }
                 updateBlock(id, val, btn, feedbackEl, card, { id: id, type: 'text', content: val });
             }
 
             else if (type === 'youtube') {
                 var ytInput = card.querySelector('[data-yt]');
                 var raw = ytInput ? ytInput.value.trim() : '';
+                if (!raw) { clearBlock(id, card, btn, feedbackEl); return; }
                 var videoId = extractYouTubeId(raw);
                 if (!videoId) { showFeedback(feedbackEl, false, 'ID YouTube invalide'); return; }
                 ytInput.value = videoId;
