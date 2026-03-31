@@ -1090,21 +1090,30 @@
             updateHomeLabel(homeToggle.checked);
             homeFeedback.textContent = '';
             homeFeedback.className = 'feedback';
-            sb.from('content_blocks')
-              .upsert({ id: 'home_enabled', type: 'text', col: 'settings', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }, { onConflict: 'id' })
-              .then(function (res) {
-                  if (res.error) {
-                      homeFeedback.textContent = 'Erreur';
-                      homeFeedback.className = 'feedback error';
-                  } else {
-                      homeFeedback.textContent = homeToggle.checked ? 'Home activée ✓' : 'Home désactivée ✓';
-                      homeFeedback.className = 'feedback success';
-                      setTimeout(function () {
-                          homeFeedback.textContent = '';
-                          homeFeedback.className = 'feedback';
-                      }, 2500);
-                  }
-              });
+            var payload = JSON.stringify([{ id: 'home_enabled', type: 'text', col: 'settings', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }]);
+            fetch(SUPABASE_URL + '/rest/v1/content_blocks?on_conflict=id', {
+                method: 'POST',
+                headers: {
+                    'apikey':        SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY,
+                    'Content-Type':  'application/json',
+                    'Prefer':        'resolution=merge-duplicates'
+                },
+                body: payload
+            })
+            .then(function (res) {
+                if (!res.ok) return res.json().then(function(e){ throw new Error(e.message || res.status); });
+                homeFeedback.textContent = homeToggle.checked ? 'Home activée ✓' : 'Home désactivée ✓';
+                homeFeedback.className = 'feedback success';
+                setTimeout(function () {
+                    homeFeedback.textContent = '';
+                    homeFeedback.className = 'feedback';
+                }, 2500);
+            })
+            .catch(function (err) {
+                homeFeedback.textContent = 'Erreur : ' + err.message;
+                homeFeedback.className = 'feedback error';
+            });
         });
 
         function loadAllBlocks() {
