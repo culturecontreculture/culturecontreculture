@@ -255,13 +255,16 @@
             justify-content: center;
         }
 
+        .block-photo {
+            /* conteneur hauteur fixe pour image unique */
+        }
         .block-photo > img {
-            max-height: 340px;
-            height: auto;
+            height: 340px;
             width: auto;
             max-width: 100%;
             display: block;
             margin: 0 auto;
+            object-fit: contain;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
@@ -279,16 +282,16 @@
         }
         .gallery-stage {
             flex: 1;
+            height: 340px;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
         }
         .gallery-stage > img {
-            max-height: 340px;
-            height: auto;
-            width: auto;
-            max-width: 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
             display: block;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
