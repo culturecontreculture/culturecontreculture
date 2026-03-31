@@ -233,17 +233,18 @@
 
         .block-photo {
             width: 100%;
-            max-height: 420px;
             overflow: hidden;
             padding: 20px 40px;
         }
 
-        .block-photo img {
+        .block-photo > img {
             width: 100%;
-            height: 100%;
-            max-height: 420px;
-            object-fit: cover;
+            max-height: 400px;
+            object-fit: contain;
             display: block;
+            border-radius: 6px;
+            border: 1px solid rgba(106, 47, 47, 0.2);
+            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
         }
 
         /* ============================
@@ -251,8 +252,16 @@
         ============================= */
 
         .gallery { position: relative; }
-        .gallery-stage { position: relative; overflow: hidden; }
-        .gallery-stage > img { width: 100%; max-height: 380px; object-fit: contain; display: block; }
+        .gallery-stage {
+            position: relative; overflow: hidden;
+            border-radius: 6px;
+            border: 1px solid rgba(106, 47, 47, 0.2);
+            box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
+        }
+        .gallery-stage > img {
+            width: 100%; max-height: 380px; object-fit: contain; display: block;
+            transition: opacity 0.35s ease;
+        }
         .gallery-arrow {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(139,0,0,0.75); color: #fff; border: none; cursor: pointer;
@@ -909,8 +918,12 @@
             var img = block.querySelector('img');
             function goTo(i) {
                 current = (i + urls.length) % urls.length;
-                img.src = urls[current];
-                block.querySelectorAll('.gallery-dot').forEach(function(d,idx){ d.classList.toggle('active', idx===current); });
+                img.style.opacity = '0';
+                setTimeout(function() {
+                    img.src = urls[current];
+                    img.style.opacity = '1';
+                    block.querySelectorAll('.gallery-dot').forEach(function(d,idx){ d.classList.toggle('active', idx===current); });
+                }, 300);
             }
             block.querySelector('.gallery-prev').addEventListener('click', function(){ goTo(current-1); });
             block.querySelector('.gallery-next').addEventListener('click', function(){ goTo(current+1); });
