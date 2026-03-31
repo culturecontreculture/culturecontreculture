@@ -914,10 +914,12 @@
             ctrlRow.insertBefore(nextB, playBtn.nextSibling);
 
             function loadTrack(i) {
+                var wasPlaying = !audio.paused;
                 current = (i + tracks.length) % tracks.length;
                 var url = (typeof tracks[current]==='object') ? tracks[current].url : tracks[current];
                 audio.src = url; audio.load();
                 zone.querySelectorAll('.audio-track-item').forEach(function(el,idx){ el.classList.toggle('active', idx===current); });
+                if (wasPlaying) audio.play();
             }
 
             loadTrack(0);
