@@ -126,15 +126,31 @@
 
         .audio-player {
             display: flex;
-            align-items: center;
-            gap: 16px;
+            flex-direction: column;
+            gap: 12px;
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             background: #0c0808;
             border: 1px solid rgba(106, 47, 47, 0.3);
             border-radius: 6px;
-            padding: 14px 20px;
+            padding: 16px 20px;
             box-shadow: 0 2px 12px rgba(100, 0, 0, 0.1);
+        }
+
+        .audio-track-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #9a6060;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: none;
+        }
+        .audio-track-name.has-title { display: block; }
+
+        .audio-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .audio-play-btn {
@@ -299,7 +315,7 @@
             transition: all 0.15s;
         }
         .audio-nav-btn:hover { border-color: #8b0000; color: #c87070; }
-        .audio-controls { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 480px; }
+        .audio-controls { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 520px; }
 
         /* ============================
            VIDEO ZONE
@@ -571,12 +587,15 @@
             <!-- 2. Audio (dynamic) -->
             <div class="zone zone-audio zone-hidden" data-id="left_audio">
                 <div class="audio-player">
-                    <button class="audio-play-btn" aria-label="Play">
-                        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-                    </button>
-                    <div class="audio-track">
-                        <div class="audio-progress"><div class="audio-progress-fill"></div></div>
-                        <span class="audio-time">0:00</span>
+                    <div class="audio-track-name"></div>
+                    <div class="audio-controls-row">
+                        <button class="audio-play-btn" aria-label="Play">
+                            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                        </button>
+                        <div class="audio-track">
+                            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+                            <span class="audio-time">0:00</span>
+                        </div>
                     </div>
                     <audio preload="none"><source src="" type="audio/mpeg"></audio>
                 </div>
@@ -705,11 +724,18 @@
 
             <!-- 2. Audio (dynamic) -->
             <div class="zone zone-audio zone-hidden" data-id="right_audio">
-                <div class="audio-wrapper">
-                    <div class="audio-label">Écouter</div>
-                    <audio controls preload="none">
-                        <source src="" type="audio/mpeg">
-                    </audio>
+                <div class="audio-player">
+                    <div class="audio-track-name"></div>
+                    <div class="audio-controls-row">
+                        <button class="audio-play-btn" aria-label="Play">
+                            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                        </button>
+                        <div class="audio-track">
+                            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+                            <span class="audio-time">0:00</span>
+                        </div>
+                    </div>
+                    <audio preload="none"><source src="" type="audio/mpeg"></audio>
                 </div>
             </div>
 
@@ -785,11 +811,16 @@
                 if (items && items.length > 1) {
                     renderPlaylist(audioZone, items);
                 } else {
-                    var url = items ? (items[0].url || items[0]) : content;
+                    var track = items ? items[0] : { url: content, title: '' };
+                    var url   = track.url || content;
+                    var title = track.title || '';
                     var source = audioZone.querySelector('audio source');
-                    var aud = audioZone.querySelector('audio');
+                    var aud    = audioZone.querySelector('audio');
                     if (source) source.src = url;
-                    if (aud) { aud.load(); initAudioPlayer(audioZone); }
+                    if (aud)    { aud.load(); initAudioPlayer(audioZone); }
+                    // Afficher le titre si présent
+                    var nameEl = audioZone.querySelector('.audio-track-name');
+                    if (nameEl && title) { nameEl.textContent = title; nameEl.classList.add('has-title'); }
                 }
                 audioZone.classList.remove('zone-hidden');
                 return;
@@ -857,11 +888,12 @@
         }
 
         function renderPlaylist(zone, tracks) {
-            var audio = zone.querySelector('audio');
-            var player = zone.querySelector('.audio-player');
+            var audio   = zone.querySelector('audio');
+            var player  = zone.querySelector('.audio-player');
+            var ctrlRow = zone.querySelector('.audio-controls-row');
             var current = 0;
 
-            // Inject track list
+            // Tracklist (injectée avant .audio-controls-row dans .audio-player)
             var listHtml = '<div class="audio-tracklist">';
             tracks.forEach(function(t, i) {
                 var title = (typeof t === 'object' && t.title) ? t.title : ('Piste ' + (i+1));
@@ -872,15 +904,14 @@
             listHtml += '</div>';
             player.insertAdjacentHTML('afterbegin', listHtml);
 
-            // Add prev/next around play button
-            var playBtn = player.querySelector('.audio-play-btn');
-            var controls = playBtn.parentNode;
+            // Prev/Next dans .audio-controls-row, autour du play-btn
+            var playBtn = ctrlRow.querySelector('.audio-play-btn');
             var prevB = document.createElement('button');
             prevB.className = 'audio-nav-btn'; prevB.innerHTML = '&#8592;'; prevB.type = 'button';
             var nextB = document.createElement('button');
             nextB.className = 'audio-nav-btn'; nextB.innerHTML = '&#8594;'; nextB.type = 'button';
-            controls.insertBefore(prevB, playBtn);
-            controls.insertBefore(nextB, playBtn.nextSibling);
+            ctrlRow.insertBefore(prevB, playBtn);
+            ctrlRow.insertBefore(nextB, playBtn.nextSibling);
 
             function loadTrack(i) {
                 current = (i + tracks.length) % tracks.length;
