@@ -1380,13 +1380,32 @@
 
             else if (type === 'audio') {
                 var tracks = mediaState[id] || [];
-                if (!tracks.length) { showFeedback(feedbackEl, false, 'Aucun morceau à enregistrer'); return; }
+                if (!tracks.length) {
+                    // Vider et masquer le bloc
+                    sb.from('content_blocks').update({ content: '', visible: false }).eq('id', id).then(function(res) {
+                        if (res.error) { showFeedback(feedbackEl, false, res.error.message); return; }
+                        var toggleInput = card.querySelector('[data-toggle]');
+                        var toggleLabel = card.querySelector('[data-toggle-label]');
+                        if (toggleInput) { toggleInput.checked = false; updateToggleLabel(toggleLabel, false); }
+                        showFeedback(feedbackEl, true, 'Bloc audio supprimé');
+                    });
+                    return;
+                }
                 var content = tracks.length === 1 ? tracks[0].url : JSON.stringify(tracks);
                 updateBlock(id, content, btn, feedbackEl, card, { id:id, type:'audio', content:content });
             }
             else if (type === 'photo') {
                 var photos = mediaState[id] || [];
-                if (!photos.length) { showFeedback(feedbackEl, false, 'Aucune photo à enregistrer'); return; }
+                if (!photos.length) {
+                    sb.from('content_blocks').update({ content: '', visible: false }).eq('id', id).then(function(res) {
+                        if (res.error) { showFeedback(feedbackEl, false, res.error.message); return; }
+                        var toggleInput = card.querySelector('[data-toggle]');
+                        var toggleLabel = card.querySelector('[data-toggle-label]');
+                        if (toggleInput) { toggleInput.checked = false; updateToggleLabel(toggleLabel, false); }
+                        showFeedback(feedbackEl, true, 'Bloc photo supprimé');
+                    });
+                    return;
+                }
                 var content = photos.length === 1 ? photos[0] : JSON.stringify(photos);
                 updateBlock(id, content, btn, feedbackEl, card, { id:id, type:'photo', content:content });
             }
