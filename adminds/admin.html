@@ -672,7 +672,7 @@
                 <span class="admin-title">Administration</span>
             </div>
             <div class="admin-header-right">
-                <a href="index.html" target="_blank" class="btn-site">Voir le site</a>
+                <a href="index.html" target="_blank" class="btn-site">Prévisualiser</a>
                 <button class="btn-logout" id="btn-logout">Déconnexion</button>
             </div>
         </header>
@@ -680,7 +680,7 @@
         <!-- HOME ENABLED BANNER -->
         <div id="home-banner" style="display:flex; align-items:center; gap:16px; padding:14px 32px; background:var(--bg3); border-bottom:1px solid var(--border2);">
             <span style="font-size:9px; letter-spacing:0.4em; text-transform:uppercase; color:var(--red); white-space:nowrap;">Home</span>
-            <span style="font-size:11px; letter-spacing:0.1em; color:var(--text-dim); flex:1;">Activer le contenu dynamique sur la home</span>
+            <span style="font-size:11px; letter-spacing:0.1em; color:var(--text-dim); flex:1;">Activer sur la vraie home</span>
             <div class="toggle-wrap">
                 <span class="toggle-label" id="home-toggle-label">off</span>
                 <label class="toggle">
@@ -1091,7 +1091,7 @@
             homeFeedback.textContent = '';
             homeFeedback.className = 'feedback';
             sb.from('content_blocks')
-              .upsert({ id: 'home_enabled', type: 'flag', col: 'settings', content: '', visible: homeToggle.checked }, { onConflict: 'id' })
+              .upsert({ id: 'home_enabled', type: 'text', col: 'settings', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }, { onConflict: 'id' })
               .then(function (res) {
                   if (res.error) {
                       homeFeedback.textContent = 'Erreur';
