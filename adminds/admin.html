@@ -607,6 +607,22 @@
         .photo-thumb .btn-remove { position: absolute; top: 4px; right: 4px; padding: 2px 6px; background: rgba(10,0,0,0.8); }
         .progress-bar-inner { height: 100%; background: var(--red); width: 0%; transition: width 0.3s; }
 
+        .input-field {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-field::placeholder { color: var(--text-muted); }
+        .input-field:focus { border-color: var(--border2); }
+
         /* Responsive */
         @media (max-width: 700px) {
             .admin-body {
