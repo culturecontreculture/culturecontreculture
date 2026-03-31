@@ -1090,14 +1090,13 @@
             updateHomeLabel(homeToggle.checked);
             homeFeedback.textContent = '';
             homeFeedback.className = 'feedback';
-            var payload = JSON.stringify([{ id: 'home_enabled', type: 'text', col: 'left', content: '', visible: homeToggle.checked, updated_at: new Date().toISOString() }]);
-            fetch(SUPABASE_URL + '/rest/v1/content_blocks?on_conflict=id', {
-                method: 'POST',
+            var payload = JSON.stringify({ visible: homeToggle.checked, updated_at: new Date().toISOString() });
+            fetch(SUPABASE_URL + '/rest/v1/content_blocks?id=eq.home_enabled', {
+                method: 'PATCH',
                 headers: {
                     'apikey':        SUPABASE_KEY,
                     'Authorization': 'Bearer ' + SUPABASE_KEY,
-                    'Content-Type':  'application/json',
-                    'Prefer':        'resolution=merge-duplicates'
+                    'Content-Type':  'application/json'
                 },
                 body: payload
             })
