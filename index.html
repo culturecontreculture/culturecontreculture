@@ -249,17 +249,18 @@
 
         .block-photo {
             width: 100%;
-            overflow: hidden;
+            overflow: visible;
             padding: 20px 40px;
+            display: flex;
+            justify-content: center;
         }
 
         .block-photo > img {
-            max-width: 100%;
-            max-height: 400px;
+            max-width: 520px;
+            max-height: 460px;
             width: auto;
             height: auto;
             display: block;
-            margin: 0 auto;
             border-radius: 6px;
             border: 1px solid rgba(106, 47, 47, 0.2);
             box-shadow: 0 4px 24px rgba(100, 0, 0, 0.1);
@@ -269,7 +270,7 @@
            GALLERY
         ============================= */
 
-        .gallery { width: 100%; }
+        .gallery { width: 100%; max-width: 520px; margin: 0 auto; }
         .gallery-nav {
             display: flex;
             align-items: center;
@@ -282,7 +283,7 @@
         }
         .gallery-stage > img {
             max-width: 100%;
-            max-height: 380px;
+            max-height: 460px;
             width: auto;
             height: auto;
             display: block;
