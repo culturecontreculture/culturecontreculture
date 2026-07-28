@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture contre culture - SAEZ - Damien Saez</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #0b0906;
+            --gold:      #c9a25f;
+            --gold-hi:   #e7d3a0;
+            --gold-dim:  #8a7346;
+            --gold-dark: #5f4e2c;
+        }
+
+        html, body {
+            width: 100%;
+            background-color: var(--bg);
+            color: var(--gold-hi);
+            font-family: 'IM Fell English', 'Playfair Display', Georgia, serif;
+        }
+
+        /* Grain vintage sur toute la page */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.30;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+        }
+        /* Vignette */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 49;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+        }
+
+        /* ============================================================
+           STRUCTURE DESKTOP : news en haut + 3 colonnes scrollables
+           ============================================================ */
+        .page {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding: 14px;
+            gap: 14px;
+        }
+
+        /* ---------------- NEWS ---------------- */
+        .news {
+            position: relative;
+            flex: 0 0 auto;
+            border: 1px solid var(--gold-dim);
+            outline: 1px solid var(--gold-dark);
+            outline-offset: 4px;
+            padding: 14px 22px 16px;
+            background: rgba(0,0,0,0.25);
+            display: none; /* affiché si contenu */
+        }
+        .news.on { display: block; }
+
+        .news-masthead {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .news-masthead .rule {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold-dim));
+        }
+        .news-masthead .rule:last-child {
+            background: linear-gradient(to left, transparent, var(--gold-dim));
+        }
+        .news-masthead .diamond { color: var(--gold-dim); font-size: 10px; }
+        .news-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            font-size: clamp(20px, 2.4vw, 30px);
+            letter-spacing: 0.45em;
+            margin-right: -0.45em;
+            color: var(--gold);
+            text-shadow: 0 0 18px rgba(201,162,95,0.25);
+        }
+
+        .news-body {
+            position: relative;
+            max-height: 76px;
+            overflow: hidden;
+            text-align: center;
+            font-size: 17px;
+            line-height: 1.55;
+            color: var(--gold-hi);
+            white-space: pre-line;
+        }
+        .news.overflowing .news-body {
+            -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+                    mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+        }
+        .news-more {
+            display: none;
+            margin: 10px auto 0;
+        }
+        .news.overflowing .news-more { display: block; }
+
+        .btn-vintage {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            padding: 8px 22px 7px 26px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-vintage:hover {
+            color: var(--bg);
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* ---------------- MODAL NEWS ---------------- */
+        .news-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--bg);
+            display: none;
+            overflow-y: auto;
+            padding: 40px 20px 80px;
+        }
+        .news-modal.open { display: block; }
+        .news-modal-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            border: 1px solid var(--gold-dim);
+            outline: 1px solid var(--gold-dark);
+            outline-offset: 5px;
+            padding: clamp(24px, 5vw, 60px);
+            position: relative;
+        }
+        .news-modal .news-body-full {
+            font-size: 19px;
+            line-height: 1.75;
+            white-space: pre-line;
+            text-align: center;
+        }
+        .news-modal-close {
+            display: block;
+            margin: 34px auto 0;
+        }
+        .modal-orn { text-align: center; color: var(--gold-dim); font-size: 18px; margin: 22px 0; letter-spacing: 0.6em; }
+
+        /* ---------------- COLONNES ---------------- */
+        .cols {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .col {
+            position: relative;
+            min-height: 0;
+            border: 1px solid var(--gold-dim);
+            background: rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        /* cadre intérieur */
+        .col::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid var(--gold-dark);
+            pointer-events: none;
+            z-index: 2;
+        }
+        /* ornements de coins */
+        .col .corner {
+            position: absolute;
+            width: 14px; height: 14px;
+            color: var(--gold);
+            font-size: 13px;
+            line-height: 14px;
+            text-align: center;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .corner.tl { top: -1px;  left: -1px; }
+        .corner.tr { top: -1px;  right: -1px; }
+        .corner.bl { bottom: -1px; left: -1px; }
+        .corner.br { bottom: -1px; right: -1px; }
+
+        .col-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 34px 26px 40px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold-dark) transparent;
+        }
+        .col-scroll::-webkit-scrollbar { width: 5px; }
+        .col-scroll::-webkit-scrollbar-thumb { background: var(--gold-dark); }
+
+        /* ---- Blocs de colonne ---- */
+        .col-brand {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: clamp(20px, 2vw, 28px);
+            letter-spacing: 0.12em;
+            text-align: center;
+            color: var(--gold);
+        }
+        .brand-underline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0 4px;
+        }
+        .brand-underline .bar { width: 56px; height: 1px; background: var(--gold-dim); }
+        .brand-underline .dot { color: var(--gold-dim); font-size: 8px; }
+
+        .orn {
+            text-align: center;
+            color: var(--gold-dim);
+            font-size: 15px;
+            margin: 22px 0;
+            letter-spacing: 0.5em;
+            margin-right: -0.5em;
+        }
+
+        .block { margin: 0 0 6px; }
+        .block.hidden { display: none; }
+
+        .block-sub {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            text-align: center;
+            font-size: 16px;
+            color: var(--gold-hi);
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .block-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            text-align: center;
+            font-size: clamp(34px, 3.4vw, 54px);
+            line-height: 1.08;
+            letter-spacing: 0.02em;
+            color: var(--gold);
+            text-transform: uppercase;
+            text-shadow: 0 0 26px rgba(201,162,95,0.22);
+        }
+
+        .block-text {
+            font-size: 16.5px;
+            line-height: 1.7;
+            text-align: center;
+            color: var(--gold-hi);
+            white-space: pre-line;
+        }
+
+        /* photo */
+        .block-photo img {
+            display: block;
+            width: 100%;
+            border: 1px solid var(--gold-dark);
+            filter: sepia(0.25) contrast(1.02);
+            transition: opacity 0.3s ease;
+        }
+        .gallery { position: relative; }
+        .gallery-stage { position: relative; }
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(11,9,6,0.7);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-size: 20px;
+            width: 34px; height: 34px;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .gallery-prev { left: 8px; }
+        .gallery-next { right: 8px; }
+        .gallery-dots { text-align: center; margin-top: 10px; }
+        .gallery-dot {
+            width: 7px; height: 7px;
+            border: 1px solid var(--gold-dim);
+            background: transparent;
+            border-radius: 50%;
+            margin: 0 4px;
+            cursor: pointer;
+            padding: 0;
+        }
+        .gallery-dot.active { background: var(--gold); border-color: var(--gold); }
+
+        /* video */
+        .video-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 1px solid var(--gold-dark);
+            background: #000;
+        }
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* audio */
+        .audio-player { text-align: center; }
+        .audio-track-name {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 15px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .audio-track-name.has-title { display: block; }
+        .audio-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+        .audio-play-btn, .audio-nav-btn {
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+        .audio-play-btn { width: 52px; height: 52px; }
+        .audio-nav-btn  { width: 36px; height: 36px; font-size: 15px; }
+        .audio-play-btn:hover, .audio-nav-btn:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+        .audio-play-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .audio-progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .audio-progress {
+            flex: 1;
+            height: 3px;
+            background: var(--gold-dark);
+            cursor: pointer;
+            position: relative;
+        }
+        .audio-progress-fill {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0%;
+            background: var(--gold);
+        }
+        .audio-time {
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: var(--gold-dim);
+            min-width: 74px;
+            text-align: right;
+            font-family: Georgia, serif;
+        }
+        .audio-tracklist { margin-bottom: 16px; }
+        .audio-track-item {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 6px 4px;
+            cursor: pointer;
+            color: var(--gold-dim);
+            font-size: 15px;
+            transition: color 0.2s ease;
+        }
+        .audio-track-item:hover, .audio-track-item.active { color: var(--gold-hi); }
+        .audio-track-item.active .audio-track-num { color: var(--gold); }
+        .audio-track-num { font-family: Georgia, serif; font-size: 12px; letter-spacing: 0.1em; padding-top: 2px; }
+
+        /* ---------------- MOBILE ---------------- */
+        .col-toggle { display: none; }
+
+        @media (max-width: 900px) {
+            .page {
+                height: auto;
+                min-height: 100dvh;
+                display: block;
+                padding: 12px;
+            }
+            .news { margin-bottom: 12px; }
+            .cols {
+                display: block;
+            }
+            .col {
+                margin-bottom: 12px;
+                display: block;
+            }
+            .col-toggle {
+                display: flex;
+                width: 100%;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                background: transparent;
+                border: none;
+                color: var(--gold);
+                font-family: 'Cinzel', serif;
+                font-weight: 700;
+                font-size: 15px;
+                letter-spacing: 0.18em;
+                padding: 18px 20px;
+                cursor: pointer;
+                text-align: left;
+                position: relative;
+                z-index: 4;
+            }
+            .col-toggle .arrow {
+                font-size: 12px;
+                color: var(--gold-dim);
+                transition: transform 0.3s ease;
+            }
+            .col.open .col-toggle .arrow { transform: rotate(180deg); }
+            .col-scroll {
+                display: none;
+                overflow: visible;
+                padding: 6px 20px 34px;
+            }
+            .col.open .col-scroll { display: block; }
+            .block-title { font-size: clamp(30px, 9vw, 44px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+
+        <!-- ==================== NEWS ==================== -->
+        <div class="news" id="news">
+            <div class="news-masthead">
+                <div class="rule"></div>
+                <span class="diamond">&#9670;</span>
+                <span class="news-title">NEWS</span>
+                <span class="diamond">&#9670;</span>
+                <div class="rule"></div>
+            </div>
+            <div class="news-body" id="news-body"></div>
+            <button class="btn-vintage news-more" id="news-more" type="button">Lire tout</button>
+        </div>
+
+        <!-- ==================== 3 COLONNES ==================== -->
+        <div class="cols" id="cols"></div>
+
+    </div>
+
+    <!-- ==================== MODAL NEWS ==================== -->
+    <div class="news-modal" id="news-modal">
+        <div class="news-modal-inner">
+            <div class="news-masthead">
+                <div class="rule"></div>
+                <span class="diamond">&#9670;</span>
+                <span class="news-title">NEWS</span>
+                <span class="diamond">&#9670;</span>
+                <div class="rule"></div>
+            </div>
+            <div class="modal-orn">&#10087;</div>
+            <div class="news-body-full" id="news-body-full"></div>
+            <div class="modal-orn">&#10087;</div>
+            <button class="btn-vintage news-modal-close" id="news-modal-close" type="button">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var SUPABASE_URL = 'https://cciypmugbemibaeuppco.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaXlwbXVnYmVtaWJhZXVwcGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY1NzE3NjEsImV4cCI6MjA0MjE0Nzc2MX0.Jz6v2Akm17_xtPw14w6RaaPV4oQ-dEGpqJhJxEd2BCo';
+        var YT_PARAMS   = 'autoplay=1&mute=1&rel=0&iv_load_policy=3';
+
+        // Contenu par défaut (identique au seed SQL) : la page reste
+        // fidèle au visuel même si la base est injoignable.
+        var DEFAULTS = {
+            news_text:  { type: 'text',    col: 'news', visible: true,  content: 'Les Maudits — l’album est disponible. La tournée des Maudits, Acte I, traversera la France en 2027. Radio France Résistance émet chaque soir à la nuit tombée.' },
+            c1_title:   { type: 'title',   col: 'c1',   visible: true,  content: 'FRANCE 2027' },
+            c1_sub:     { type: 'text',    col: 'c1',   visible: true,  content: 'La tournée des Maudits — Acte I' },
+            c1_photo:   { type: 'photo',   col: 'c1',   visible: false, content: null },
+            c1_youtube: { type: 'youtube', col: 'c1',   visible: false, content: null },
+            c1_audio:   { type: 'audio',   col: 'c1',   visible: false, content: null },
+            c2_title:   { type: 'title',   col: 'c2',   visible: true,  content: 'MÉLANCOLIE WHISKY' },
+            c2_sub:     { type: 'text',    col: 'c2',   visible: false, content: null },
+            c2_photo:   { type: 'photo',   col: 'c2',   visible: false, content: null },
+            c2_youtube: { type: 'youtube', col: 'c2',   visible: true,  content: 'hu-ZxnbivT0' },
+            c2_audio:   { type: 'audio',   col: 'c2',   visible: false, content: null },
+            c3_title:   { type: 'title',   col: 'c3',   visible: true,  content: 'LA TRAGÉDIE DE PARIS' },
+            c3_sub:     { type: 'text',    col: 'c3',   visible: true,  content: 'Les Maudits l’album / Le Concert du Siècle' },
+            c3_photo:   { type: 'photo',   col: 'c3',   visible: false, content: null },
+            c3_youtube: { type: 'youtube', col: 'c3',   visible: false, content: null },
+            c3_audio:   { type: 'audio',   col: 'c3',   visible: false, content: null }
+        };
+
+        var COLS = ['c1', 'c2', 'c3'];
+        var ROMAN = { c1: 'I', c2: 'II', c3: 'III' };
+
+        // ---------- helpers ----------
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function parseItems(content) {
+            try {
+                var p = JSON.parse(content);
+                if (Array.isArray(p) && p.length) return p;
+            } catch (e) {}
+            return null;
+        }
+
+        function fmt(s) {
+            if (!isFinite(s)) return '0:00';
+            var m = Math.floor(s / 60);
+            var sec = Math.floor(s % 60);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        // ---------- rendu ----------
+        function render(blocks) {
+            renderNews(blocks.news_text);
+
+            var colsEl = document.getElementById('cols');
+            colsEl.innerHTML = '';
+
+            COLS.forEach(function (c) {
+                var col = document.createElement('div');
+                col.className = 'col';
+                var title = blocks[c + '_title'];
+                var toggleLabel = (title && title.visible && title.content)
+                    ? title.content : 'Acte ' + ROMAN[c];
+
+                col.innerHTML =
+                    '<span class="corner tl">&#10022;</span>' +
+                    '<span class="corner tr">&#10022;</span>' +
+                    '<span class="corner bl">&#10022;</span>' +
+                    '<span class="corner br">&#10022;</span>' +
+                    '<button class="col-toggle" type="button">' +
+                        '<span>' + esc(toggleLabel) + '</span>' +
+                        '<span class="arrow">&#9660;</span>' +
+                    '</button>' +
+                    '<div class="col-scroll">' +
+                        '<div class="col-brand">LES MAUDITS</div>' +
+                        '<div class="brand-underline"><span class="bar"></span><span class="dot">&#9670;</span><span class="bar"></span></div>' +
+                        '<div class="col-body"></div>' +
+                    '</div>';
+
+                var body = col.querySelector('.col-body');
+                var order = ['sub', 'title', 'photo', 'youtube', 'audio'];
+                var shown = 0;
+
+                order.forEach(function (kind) {
+                    var b = blocks[c + '_' + (kind === 'sub' ? 'sub' : kind)];
+                    if (!b || !b.visible || !b.content) return;
+                    if (shown > 0 || kind !== 'sub') body.appendChild(makeOrn(shown));
+                    body.appendChild(makeBlock(kind, b));
+                    shown++;
+                });
+
+                // ornement de pied si contenu
+                if (shown > 0) {
+                    var foot = document.createElement('div');
+                    foot.className = 'orn';
+                    foot.innerHTML = '&#10087;';
+                    body.appendChild(foot);
+                }
+
+                col.querySelector('.col-toggle').addEventListener('click', function () {
+                    col.classList.toggle('open');
+                });
+
+                colsEl.appendChild(col);
+            });
+
+        }
+
+        function makeOrn(index) {
+            var d = document.createElement('div');
+            d.className = 'orn';
+            d.innerHTML = index === 0 ? '&#10086;' : '&#9670; &#9670; &#9670;';
+            return d;
+        }
+
+        function makeBlock(kind, b) {
+            var el = document.createElement('div');
+            el.className = 'block block-' + kind;
+
+            if (kind === 'sub') {
+                el.className = 'block block-sub';
+                el.textContent = b.content;
+
+            } else if (kind === 'title') {
+                el.className = 'block block-title';
+                el.textContent = b.content;
+
+            } else if (kind === 'photo') {
+                renderPhoto(el, b.content);
+
+            } else if (kind === 'youtube') {
+                el.innerHTML = '<div class="video-wrap"></div>';
+                var iframe = document.createElement('iframe');
+                iframe.src = 'https://www.youtube.com/embed/' + encodeURIComponent(b.content) + '?' + YT_PARAMS;
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                iframe.setAttribute('allowfullscreen', '');
+                el.querySelector('.video-wrap').appendChild(iframe);
+
+            } else if (kind === 'audio') {
+                renderAudio(el, b.content);
+            }
+            return el;
+        }
+
+        // ---- photo / galerie ----
+        function renderPhoto(el, content) {
+            var items = parseItems(content);
+            var urls = items ? items.map(function (i) { return (typeof i === 'object') ? i.url : i; }) : [content];
+            var multi = urls.length > 1;
+
+            var html = '<div class="gallery"><div class="gallery-stage"><img src="' + esc(urls[0]) + '" alt="">';
+            if (multi) html += '<button class="gallery-arrow gallery-prev" type="button">&#8249;</button><button class="gallery-arrow gallery-next" type="button">&#8250;</button>';
+            html += '</div>';
+            if (multi) {
+                html += '<div class="gallery-dots">';
+                urls.forEach(function (_, i) { html += '<button class="gallery-dot' + (i === 0 ? ' active' : '') + '" data-di="' + i + '" type="button"></button>'; });
+                html += '</div>';
+            }
+            html += '</div>';
+            el.innerHTML = html;
+
+            if (!multi) return;
+            var current = 0;
+            var img = el.querySelector('img');
+            function goTo(i) {
+                current = (i + urls.length) % urls.length;
+                img.style.opacity = '0';
+                setTimeout(function () {
+                    img.src = urls[current];
+                    img.style.opacity = '1';
+                    el.querySelectorAll('.gallery-dot').forEach(function (d, idx) { d.classList.toggle('active', idx === current); });
+                }, 300);
+            }
+            el.querySelector('.gallery-prev').addEventListener('click', function () { goTo(current - 1); });
+            el.querySelector('.gallery-next').addEventListener('click', function () { goTo(current + 1); });
+            el.querySelectorAll('.gallery-dot').forEach(function (d) {
+                d.addEventListener('click', function () { goTo(parseInt(d.getAttribute('data-di'), 10)); });
+            });
+        }
+
+        // ---- audio / playlist ----
+        function renderAudio(el, content) {
+            var items = parseItems(content);
+            var tracks = items
+                ? items.map(function (t) { return (typeof t === 'object') ? t : { url: t, title: '' }; })
+                : [{ url: content, title: '' }];
+            var multi = tracks.length > 1;
+            var current = 0;
+
+            var html = '<div class="audio-player">';
+            if (multi) {
+                html += '<div class="audio-tracklist">';
+                tracks.forEach(function (t, i) {
+                    var title = t.title || ('Piste ' + (i + 1));
+                    html += '<div class="audio-track-item' + (i === 0 ? ' active' : '') + '" data-ti="' + i + '">' +
+                        '<span class="audio-track-num">0' + (i + 1) + '</span>' +
+                        '<span class="audio-track-title">' + esc(title) + '</span></div>';
+                });
+                html += '</div>';
+            } else if (tracks[0].title) {
+                html += '<div class="audio-track-name has-title">' + esc(tracks[0].title) + '</div>';
+            }
+            html += '<div class="audio-controls-row">';
+            if (multi) html += '<button class="audio-nav-btn audio-prev" type="button">&#8592;</button>';
+            html += '<button class="audio-play-btn" type="button"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>';
+            if (multi) html += '<button class="audio-nav-btn audio-next" type="button">&#8594;</button>';
+            html += '</div>' +
+                '<div class="audio-progress-row">' +
+                    '<div class="audio-progress"><div class="audio-progress-fill"></div></div>' +
+                    '<div class="audio-time">0:00 / 0:00</div>' +
+                '</div></div>';
+            el.innerHTML = html;
+
+            var audio = document.createElement('audio');
+            audio.preload = 'metadata';
+            audio.src = tracks[0].url;
+            el.appendChild(audio);
+
+            var btn    = el.querySelector('.audio-play-btn');
+            var fill   = el.querySelector('.audio-progress-fill');
+            var bar    = el.querySelector('.audio-progress');
+            var timeEl = el.querySelector('.audio-time');
+            var playIcon  = '<polygon points="5,3 19,12 5,21"/>';
+            var pauseIcon = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
+
+            function loadTrack(i) {
+                var wasPlaying = !audio.paused;
+                current = (i + tracks.length) % tracks.length;
+                audio.src = tracks[current].url;
+                audio.load();
+                el.querySelectorAll('.audio-track-item').forEach(function (t, idx) { t.classList.toggle('active', idx === current); });
+                if (wasPlaying) audio.play();
+            }
+
+            btn.addEventListener('click', function () {
+                if (audio.paused) audio.play(); else audio.pause();
+            });
+            audio.addEventListener('play',  function () { btn.querySelector('svg').innerHTML = pauseIcon; });
+            audio.addEventListener('pause', function () { btn.querySelector('svg').innerHTML = playIcon; });
+            audio.addEventListener('timeupdate', function () {
+                if (audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+                timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration || 0);
+            });
+            audio.addEventListener('ended', function () {
+                if (multi) { loadTrack(current + 1); audio.play(); }
+            });
+            bar.addEventListener('click', function (e) {
+                var rect = bar.getBoundingClientRect();
+                if (audio.duration) audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+            });
+
+            if (multi) {
+                el.querySelector('.audio-prev').addEventListener('click', function () { loadTrack(current - 1); });
+                el.querySelector('.audio-next').addEventListener('click', function () { loadTrack(current + 1); });
+                el.querySelectorAll('.audio-track-item').forEach(function (t) {
+                    t.addEventListener('click', function () { loadTrack(parseInt(t.getAttribute('data-ti'), 10)); });
+                });
+            }
+        }
+
+        // ---- news ----
+        function renderNews(b) {
+            var news = document.getElementById('news');
+            if (!b || !b.visible || !b.content) {
+                news.classList.remove('on');
+                return;
+            }
+            var body = document.getElementById('news-body');
+            body.textContent = b.content;
+            document.getElementById('news-body-full').textContent = b.content;
+            news.classList.add('on');
+
+            // le bouton "lire tout" n'apparaît que si ça déborde
+            requestAnimationFrame(function () {
+                news.classList.toggle('overflowing', body.scrollHeight > body.clientHeight + 4);
+            });
+        }
+
+        var modal = document.getElementById('news-modal');
+        document.getElementById('news-more').addEventListener('click', function () {
+            modal.classList.add('open');
+            modal.scrollTop = 0;
+        });
+        document.getElementById('news-modal-close').addEventListener('click', function () {
+            modal.classList.remove('open');
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') modal.classList.remove('open');
+        });
+
+        // ---------- chargement ----------
+        function load() {
+            var blocks = {};
+            Object.keys(DEFAULTS).forEach(function (k) {
+                blocks[k] = {
+                    type: DEFAULTS[k].type,
+                    col: DEFAULTS[k].col,
+                    visible: DEFAULTS[k].visible,
+                    content: DEFAULTS[k].content
+                };
+            });
+
+            var url = SUPABASE_URL + '/rest/v1/trois_blocks?select=id,type,col,content,visible';
+            fetch(url, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+            })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (rows) {
+                rows.forEach(function (row) { blocks[row.id] = row; });
+                render(blocks);
+            })
+            .catch(function (err) {
+                console.warn('[CCC/trois] Contenu dynamique indisponible :', err.message);
+                render(blocks); // fallback : défauts
+            });
+        }
+
+        load();
+    })();
+    </script>
+</body>
+</html>

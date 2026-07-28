@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trois — Administration</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:       #121009;
+            --panel:    #1b1810;
+            --border:   #35301f;
+            --gold:     #c9a25f;
+            --gold-hi:  #e7d3a0;
+            --gold-dim: #8a7346;
+            --txt:      #d8cdb0;
+            --ok:       #7dbb6e;
+            --err:      #cc6b5a;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ---------- password ---------- */
+        #pw-screen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg);
+            z-index: 10;
+        }
+        .pw-box {
+            width: min(90vw, 360px);
+            border: 1px solid var(--border);
+            padding: 36px 32px;
+            text-align: center;
+            background: var(--panel);
+        }
+        .pw-logo {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            font-size: 17px;
+            margin-bottom: 4px;
+        }
+        .pw-title { font-size: 13px; color: var(--gold-dim); margin-bottom: 24px; letter-spacing: 0.1em; }
+        .pw-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--txt);
+            padding: 10px 12px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        .pw-input:focus { outline: none; border-color: var(--gold-dim); }
+        .pw-error { color: var(--err); font-size: 13px; margin-bottom: 10px; display: none; }
+        .pw-error.show { display: block; }
+        .pw-btn, .btn {
+            background: var(--gold);
+            color: #14110a;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+        }
+        .pw-btn:hover, .btn:hover { background: var(--gold-hi); }
+
+        /* ---------- layout ---------- */
+        #admin { display: none; }
+        #admin.on { display: block; }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        .admin-logo {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: 0.15em;
+            font-size: 15px;
+        }
+        .admin-sub { color: var(--gold-dim); font-size: 13px; margin-left: 12px; }
+        .header-right { display: flex; gap: 10px; }
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--txt);
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-ghost:hover { border-color: var(--gold-dim); color: var(--gold-hi); }
+
+        .admin-body {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 28px 20px 80px;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.25em;
+            font-size: 15px;
+            margin: 36px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+        .card.wide { grid-column: 1 / -1; }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 18px;
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .card-name { font-size: 14px; font-weight: 600; color: var(--gold-hi); letter-spacing: 0.05em; }
+
+        /* toggle */
+        .toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .toggle input { display: none; }
+        .toggle .track {
+            width: 38px; height: 20px;
+            background: var(--border);
+            border-radius: 20px;
+            position: relative;
+            transition: background 0.2s ease;
+        }
+        .toggle .track::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 16px; height: 16px;
+            background: var(--txt);
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        .toggle input:checked + .track { background: var(--gold); }
+        .toggle input:checked + .track::after { transform: translateX(18px); background: #14110a; }
+        .toggle .lbl { font-size: 12px; color: var(--gold-dim); min-width: 52px; }
+        .toggle input:checked ~ .lbl { color: var(--ok); }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--txt);
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--gold-dim); }
+        textarea { min-height: 90px; }
+        textarea.tall { min-height: 160px; }
+
+        .hint { font-size: 12px; color: var(--gold-dim); margin: 8px 0; line-height: 1.5; }
+
+        .file-area {
+            border: 1px dashed var(--border);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 10px;
+            transition: border-color 0.2s ease;
+        }
+        .file-area:hover { border-color: var(--gold-dim); }
+        .file-area input[type="file"] {
+            position: absolute; inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-hint { font-size: 13px; color: var(--gold-dim); }
+        .file-name { font-size: 12px; color: var(--gold-hi); margin-top: 6px; word-break: break-all; }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .feedback { font-size: 13px; }
+        .feedback.ok { color: var(--ok); }
+        .feedback.err { color: var(--err); }
+
+        .preview { margin-top: 12px; }
+        .preview img { max-width: 100%; max-height: 160px; border: 1px solid var(--border); display: block; }
+        .preview audio { width: 100%; }
+        .preview .multi { font-size: 12px; color: var(--gold-dim); margin-top: 4px; }
+
+        #global-error {
+            display: none;
+            background: #3a1f18;
+            border: 1px solid var(--err);
+            color: #eec7bd;
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        #global-error.show { display: block; }
+        code { background: rgba(255,255,255,0.07); padding: 1px 5px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD ==================== -->
+    <div id="pw-screen">
+        <div class="pw-box">
+            <div class="pw-logo">Culture contre Culture</div>
+            <div class="pw-title">TROIS — ADMINISTRATION</div>
+            <input type="password" class="pw-input" id="pw-input" placeholder="Mot de passe" autocomplete="current-password">
+            <div class="pw-error" id="pw-error">Mot de passe incorrect</div>
+            <button class="pw-btn" id="pw-btn">Entrer</button>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN ==================== -->
+    <div id="admin">
+        <header class="admin-header">
+            <div>
+                <span class="admin-logo">TROIS</span>
+                <span class="admin-sub">Administration</span>
+            </div>
+            <div class="header-right">
+                <a href="../index.html" target="_blank" class="btn-ghost">Voir la page</a>
+                <button class="btn-ghost" id="btn-logout">Déconnexion</button>
+            </div>
+        </header>
+
+        <div class="admin-body">
+            <div id="global-error"></div>
+            <div id="sections"></div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var SUPABASE_URL = 'https://cciypmugbemibaeuppco.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaXlwbXVnYmVtaWJhZXVwcGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY1NzE3NjEsImV4cCI6MjA0MjE0Nzc2MX0.Jz6v2Akm17_xtPw14w6RaaPV4oQ-dEGpqJhJxEd2BCo';
+        var ADMIN_PASS   = 'l0nes0mepir4te!';
+        var SESSION_KEY  = 'ccc_trois_admin';
+        var TABLE        = 'trois_blocks';
+
+        var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ---------- config des blocs ----------
+        var SECTIONS = [
+            { title: 'NEWS', blocks: [
+                { id: 'news_text', name: 'Texte de la news', kind: 'textarea-tall', wide: true,
+                  hint: 'Affichée en pleine largeur au-dessus des colonnes. Si le texte dépasse la hauteur limite, un bouton « Lire tout » ouvre la news en plein écran.' }
+            ]},
+            { title: 'COLONNE I', col: 'c1' },
+            { title: 'COLONNE II', col: 'c2' },
+            { title: 'COLONNE III', col: 'c3' }
+        ];
+
+        function colBlocks(c) {
+            return [
+                { id: c + '_title',   name: 'Grand titre',   kind: 'input',
+                  hint: 'Le grand titre de la colonne (ex : FRANCE 2027). Sert aussi de libellé au bouton en vue mobile.' },
+                { id: c + '_sub',     name: 'Texte',         kind: 'textarea',
+                  hint: 'Texte libre affiché au-dessus du grand titre (ex : La tournée des Maudits — Acte I).' },
+                { id: c + '_photo',   name: 'Visuel(s)',     kind: 'photo',
+                  hint: 'Une ou plusieurs images. Plusieurs images = galerie avec flèches.' },
+                { id: c + '_youtube', name: 'Vidéo YouTube', kind: 'youtube',
+                  hint: 'Coller une URL YouTube ou directement l’identifiant de la vidéo.' },
+                { id: c + '_audio',   name: 'Son(s)',        kind: 'audio',
+                  hint: 'Un ou plusieurs fichiers audio. Plusieurs fichiers = playlist. Le titre affiché reprend le nom du fichier.' }
+            ];
+        }
+
+        // ---------- login ----------
+        var pwScreen = document.getElementById('pw-screen');
+        var pwInput  = document.getElementById('pw-input');
+        var pwError  = document.getElementById('pw-error');
+        var adminEl  = document.getElementById('admin');
+
+        function showAdmin() {
+            pwScreen.style.display = 'none';
+            adminEl.classList.add('on');
+            buildUI();
+            loadAll();
+        }
+        function tryLogin() {
+            if (pwInput.value === ADMIN_PASS) {
+                sessionStorage.setItem(SESSION_KEY, '1');
+                showAdmin();
+            } else {
+                pwError.classList.add('show');
+                pwInput.value = '';
+            }
+        }
+        document.getElementById('pw-btn').addEventListener('click', tryLogin);
+        pwInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
+        document.getElementById('btn-logout').addEventListener('click', function () {
+            sessionStorage.removeItem(SESSION_KEY);
+            location.reload();
+        });
+        if (sessionStorage.getItem(SESSION_KEY) === '1') showAdmin();
+
+        // ---------- helpers ----------
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function extractYouTubeId(input) {
+            input = (input || '').trim();
+            if (!input) return '';
+            var m = input.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+            if (m) return m[1];
+            if (/^[A-Za-z0-9_-]{6,}$/.test(input)) return input;
+            return input;
+        }
+
+        function parseItems(content) {
+            try {
+                var p = JSON.parse(content);
+                if (Array.isArray(p) && p.length) return p;
+            } catch (e) {}
+            return null;
+        }
+
+        function stripExt(name) {
+            return name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+        }
+
+        function showFeedback(el, ok, msg) {
+            el.textContent = msg;
+            el.className = 'feedback ' + (ok ? 'ok' : 'err');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(function () { el.textContent = ''; }, 4000);
+        }
+
+        function globalError(msg) {
+            var el = document.getElementById('global-error');
+            el.innerHTML = msg;
+            el.classList.add('show');
+        }
+
+        // ---------- construction UI ----------
+        function buildUI() {
+            var root = document.getElementById('sections');
+            root.innerHTML = '';
+            SECTIONS.forEach(function (sec) {
+                var h = document.createElement('div');
+                h.className = 'section-title';
+                h.textContent = sec.title;
+                root.appendChild(h);
+
+                var grid = document.createElement('div');
+                grid.className = 'cards';
+                root.appendChild(grid);
+
+                var blocks = sec.blocks || colBlocks(sec.col);
+                blocks.forEach(function (cfg) {
+                    grid.appendChild(buildCard(cfg));
+                });
+            });
+        }
+
+        function buildCard(cfg) {
+            var card = document.createElement('div');
+            card.className = 'card' + (cfg.wide ? ' wide' : '');
+            card.setAttribute('data-id', cfg.id);
+            card._cfg = cfg;
+
+            var html =
+                '<div class="card-head">' +
+                    '<span class="card-name">' + esc(cfg.name) + '</span>' +
+                    '<label class="toggle">' +
+                        '<input type="checkbox" data-visible>' +
+                        '<span class="track"></span>' +
+                        '<span class="lbl" data-lbl>Masqué</span>' +
+                    '</label>' +
+                '</div>';
+
+            if (cfg.kind === 'input' || cfg.kind === 'youtube') {
+                html += '<input type="text" data-content placeholder="">';
+            } else if (cfg.kind === 'textarea' || cfg.kind === 'textarea-tall') {
+                html += '<textarea data-content class="' + (cfg.kind === 'textarea-tall' ? 'tall' : '') + '"></textarea>';
+            } else if (cfg.kind === 'photo' || cfg.kind === 'audio') {
+                var accept = cfg.kind === 'photo' ? 'image/*' : 'audio/*';
+                html +=
+                    '<div class="file-area">' +
+                        '<input type="file" data-file accept="' + accept + '" multiple>' +
+                        '<div class="file-hint">Cliquer pour choisir un ou plusieurs fichiers</div>' +
+                        '<div class="file-name" data-filename></div>' +
+                    '</div>' +
+                    '<div class="preview" data-preview></div>';
+            }
+
+            if (cfg.hint) html += '<div class="hint">' + esc(cfg.hint) + '</div>';
+
+            html +=
+                '<div class="card-actions">' +
+                    '<button class="btn" data-save>Enregistrer</button>' +
+                    (cfg.kind === 'photo' || cfg.kind === 'audio' ? '<button class="btn-ghost" data-clear type="button">Vider</button>' : '') +
+                    '<span class="feedback" data-feedback></span>' +
+                '</div>';
+
+            card.innerHTML = html;
+            wireCard(card, cfg);
+            return card;
+        }
+
+        function wireCard(card, cfg) {
+            var toggle   = card.querySelector('[data-visible]');
+            var lbl      = card.querySelector('[data-lbl]');
+            var saveBtn  = card.querySelector('[data-save]');
+            var feedback = card.querySelector('[data-feedback]');
+            var fileIn   = card.querySelector('[data-file]');
+            var clearBtn = card.querySelector('[data-clear]');
+
+            toggle.addEventListener('change', function () {
+                var checked = toggle.checked;
+                lbl.textContent = checked ? 'Visible' : 'Masqué';
+                sb.from(TABLE).update({ visible: checked }).eq('id', cfg.id)
+                  .then(function (res) {
+                      if (res.error) {
+                          toggle.checked = !checked;
+                          lbl.textContent = toggle.checked ? 'Visible' : 'Masqué';
+                          showFeedback(feedback, false, res.error.message);
+                      } else {
+                          showFeedback(feedback, true, checked ? 'Bloc visible' : 'Bloc masqué');
+                      }
+                  });
+            });
+
+            if (fileIn) {
+                fileIn.addEventListener('change', function () {
+                    var names = Array.prototype.map.call(fileIn.files, function (f) { return f.name; });
+                    card.querySelector('[data-filename]').textContent = names.join(' · ');
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function () {
+                    updateContent(cfg.id, null, feedback, function () {
+                        card.querySelector('[data-preview]').innerHTML = '';
+                        card.querySelector('[data-filename]').textContent = '';
+                        if (fileIn) fileIn.value = '';
+                    });
+                });
+            }
+
+            saveBtn.addEventListener('click', function () {
+                if (cfg.kind === 'photo' || cfg.kind === 'audio') {
+                    if (!fileIn.files.length) {
+                        showFeedback(feedback, false, 'Choisir d’abord un fichier');
+                        return;
+                    }
+                    uploadFiles(card, cfg, feedback, saveBtn);
+                } else {
+                    var input = card.querySelector('[data-content]');
+                    var value = input.value.trim();
+                    if (cfg.kind === 'youtube') value = extractYouTubeId(value);
+                    updateContent(cfg.id, value || null, feedback);
+                }
+            });
+        }
+
+        // ---------- data ----------
+        function loadAll() {
+            sb.from(TABLE).select('id,type,col,content,visible')
+              .then(function (res) {
+                  if (res.error) {
+                      globalError(
+                          'Impossible de charger <code>trois_blocks</code> : ' + esc(res.error.message) +
+                          '<br>Si la table n’existe pas encore, exécuter <code>trois/schema.sql</code> dans le SQL editor Supabase.'
+                      );
+                      return;
+                  }
+                  res.data.forEach(populate);
+              });
+        }
+
+        function populate(block) {
+            var card = document.querySelector('.card[data-id="' + block.id + '"]');
+            if (!card) return;
+            var toggle = card.querySelector('[data-visible]');
+            var lbl    = card.querySelector('[data-lbl]');
+            toggle.checked = !!block.visible;
+            lbl.textContent = block.visible ? 'Visible' : 'Masqué';
+
+            var input = card.querySelector('[data-content]');
+            if (input && block.content) input.value = block.content;
+
+            var preview = card.querySelector('[data-preview]');
+            if (preview) renderPreview(preview, card._cfg.kind, block.content);
+        }
+
+        function renderPreview(preview, kind, content) {
+            preview.innerHTML = '';
+            if (!content) return;
+            var items = parseItems(content);
+            var urls = items
+                ? items.map(function (i) { return (typeof i === 'object') ? i.url : i; })
+                : [content];
+
+            if (kind === 'photo') {
+                preview.innerHTML = '<img src="' + esc(urls[0]) + '" alt="">' +
+                    (urls.length > 1 ? '<div class="multi">' + urls.length + ' images (galerie)</div>' : '');
+            } else if (kind === 'audio') {
+                preview.innerHTML = '<audio controls src="' + esc(urls[0]) + '"></audio>' +
+                    (urls.length > 1 ? '<div class="multi">' + urls.length + ' pistes (playlist)</div>' : '');
+            }
+        }
+
+        function updateContent(id, content, feedback, cb) {
+            sb.from(TABLE).update({ content: content }).eq('id', id)
+              .then(function (res) {
+                  if (res.error) {
+                      showFeedback(feedback, false, res.error.message);
+                  } else {
+                      showFeedback(feedback, true, 'Enregistré');
+                      if (cb) cb();
+                  }
+              });
+        }
+
+        function uploadFiles(card, cfg, feedback, btn) {
+            var fileIn = card.querySelector('[data-file]');
+            var files  = Array.prototype.slice.call(fileIn.files);
+            var bucket = cfg.kind === 'photo' ? 'photos' : 'audio';
+            btn.disabled = true;
+            showFeedback(feedback, true, 'Envoi en cours…');
+
+            var uploaded = [];
+            var chain = Promise.resolve();
+
+            files.forEach(function (file, idx) {
+                chain = chain.then(function () {
+                    var safe = file.name.replace(/[^A-Za-z0-9._-]+/g, '_');
+                    var path = 'trois/' + cfg.id + '_' + idx + '_' + safe;
+                    return sb.storage.from(bucket)
+                        .upload(path, file, { upsert: true, cacheControl: '3600' })
+                        .then(function (res) {
+                            if (res.error) throw new Error(res.error.message);
+                            var pub = sb.storage.from(bucket).getPublicUrl(path);
+                            uploaded.push({
+                                url: pub.data.publicUrl,
+                                title: stripExt(file.name)
+                            });
+                        });
+                });
+            });
+
+            chain.then(function () {
+                var content;
+                if (cfg.kind === 'photo') {
+                    content = uploaded.length > 1
+                        ? JSON.stringify(uploaded.map(function (u) { return u.url; }))
+                        : uploaded[0].url;
+                } else {
+                    content = JSON.stringify(uploaded);
+                }
+                return sb.from(TABLE).update({ content: content }).eq('id', cfg.id)
+                    .then(function (res) {
+                        if (res.error) throw new Error(res.error.message);
+                        showFeedback(feedback, true, 'Fichier(s) enregistré(s)');
+                        renderPreview(card.querySelector('[data-preview]'), cfg.kind, content);
+                        fileIn.value = '';
+                        card.querySelector('[data-filename]').textContent = '';
+                    });
+            })
+            .catch(function (err) {
+                showFeedback(feedback, false, err.message || 'Erreur upload');
+            })
+            .then(function () {
+                btn.disabled = false;
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
