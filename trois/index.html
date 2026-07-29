@@ -46,6 +46,66 @@
         }
 
         /* ============================================================
+           ÉCRAN MOT DE PASSE
+           ============================================================ */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .gate.off { display: none; }
+        .gate-box {
+            width: min(92vw, 420px);
+            border: 1px solid var(--gold-dim);
+            outline: 1px solid var(--gold-dark);
+            outline-offset: 5px;
+            padding: clamp(30px, 6vw, 52px) clamp(22px, 5vw, 44px);
+            text-align: center;
+            position: relative;
+        }
+        .gate-brand {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.14em;
+            color: var(--gold);
+        }
+        .gate-orn {
+            color: var(--gold-dim);
+            font-size: 14px;
+            letter-spacing: 0.5em;
+            margin-right: -0.5em;
+            margin: 16px 0 26px;
+        }
+        .gate-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold-hi);
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            text-align: center;
+            letter-spacing: 0.2em;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+        }
+        .gate-input:focus { outline: none; border-color: var(--gold); }
+        .gate-error {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #b3654f;
+            font-size: 14px;
+            margin-bottom: 14px;
+            visibility: hidden;
+        }
+        .gate-error.show { visibility: visible; }
+
+        /* ============================================================
            STRUCTURE DESKTOP : news en haut + 3 colonnes scrollables
            ============================================================ */
         .page {
@@ -192,7 +252,7 @@
             z-index: 2;
         }
         /* ornements de coins */
-        .col .corner {
+        .col .corner, .gate-box .corner {
             position: absolute;
             width: 14px; height: 14px;
             color: var(--gold);
@@ -458,6 +518,21 @@
     </style>
 </head>
 <body>
+
+    <!-- ==================== MOT DE PASSE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-box">
+            <span class="corner tl">&#10022;</span>
+            <span class="corner tr">&#10022;</span>
+            <span class="corner bl">&#10022;</span>
+            <span class="corner br">&#10022;</span>
+            <div class="gate-brand">LES MAUDITS</div>
+            <div class="gate-orn">&#9670; &#9670; &#9670;</div>
+            <input type="password" class="gate-input" id="gate-input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password">
+            <div class="gate-error" id="gate-error">Ce n&rsquo;est pas le mot juste.</div>
+            <button class="btn-vintage" id="gate-btn" type="button">Entrer</button>
+        </div>
+    </div>
 
     <div class="page">
 
@@ -820,7 +895,36 @@
             });
         }
 
-        load();
+        // ---------- mot de passe ----------
+        var GATE_PASS = 'l0nes0mepir4te!';
+        var GATE_KEY  = 'ccc_trois_gate';
+        var gate      = document.getElementById('gate');
+        var gateInput = document.getElementById('gate-input');
+        var gateError = document.getElementById('gate-error');
+
+        function unlock() {
+            gate.classList.add('off');
+            load();
+        }
+        function tryGate() {
+            if (gateInput.value === GATE_PASS) {
+                sessionStorage.setItem(GATE_KEY, '1');
+                unlock();
+            } else {
+                gateError.classList.add('show');
+                gateInput.value = '';
+            }
+        }
+        document.getElementById('gate-btn').addEventListener('click', tryGate);
+        gateInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') tryGate();
+        });
+
+        if (sessionStorage.getItem(GATE_KEY) === '1') {
+            unlock();
+        } else {
+            gateInput.focus();
+        }
     })();
     </script>
 </body>
